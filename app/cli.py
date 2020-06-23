@@ -7,7 +7,7 @@ from models import AVAILABLE_MODELS
 def get_data(dataset_id=None):
     clone_dir = "/tmp/emission_data"
     os.system(f'git clone https://github.com/Compensate-Operations/emission-sample-data.git {clone_dir}/')
-    os.system(f'for i in /tmp/emissiondata/datasets/textile-v1.0.0/*.tgz; do tar -zxvf "$i" -C {clone_dir}/ ;done')
+    os.system(f'for i in {clone_dir}/datasets/textile-v1.0.0/*.tgz; do tar -zxvf "$i" -C {clone_dir}/ ;done')
     os.system(f'rm {clone_dir}/._textile-v1.0.0-5.csv')
     content = sorted(filter(lambda x: x.endswith(".csv"), os.listdir(clone_dir)))
     return pd.concat((pd.read_csv(f'{clone_dir}/{f}') for f in content))
