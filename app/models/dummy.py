@@ -3,7 +3,7 @@
 from . import CarbonModelBase
 
 class DummyModel(CarbonModelBase):
-    def train(self, X, y, save_to=None):
+    def train(self, X, y, base_dir=None):
         print("Training the model")
     
     

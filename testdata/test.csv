@@ -1,0 +1,101 @@
+brand,category-1,category-2,category-3,co2_total,colour,fabric_type,ftp_acrylic,ftp_cotton,ftp_elastane,ftp_linen,ftp_other,ftp_polyamide,ftp_polyester,ftp_polypropylene,ftp_silk,ftp_viscose,ftp_wool,gender,label,made_in,season,size,unspsc_code,weight
+b62,clothing,headgear,knit-cap,,mosaic,K,1.0,90.0,,,,,,3.0,,3.0,,W,,DE,,M,,
+b63,womenswear,women-undergarments,panties,,indigo,K,6.0,37.0,10.0,7.0,10.0,,,,,13.0,14.0,W,,KR,,XL,,0.02
+b129,baby,nightwear,pyjama,,lime,K,3.0,4.0,,,5.0,,,7.0,71.0,,8.0,,,VN,,S,,0.113
+b107,baby,footwear,socks,,mosaic,K,,5.0,16.0,,12.0,,,6.0,,20.0,38.0,,,CN,,XS,,0.021
+b119,kidswear,suit,tie,,blue gray,K,15.0,,,33.0,7.0,,14.0,11.0,15.0,,1.0,Y,,CN,,XS,,
+b102,womenswear,beachwear,shorts,,pink,K,7.0,,10.0,39.0,5.0,,,,,37.0,,W,,CN,SUM,XXL,,
+b134,kidswear,nightwear,pyjama,,black,K,11.0,,,72.0,,11.0,,,,,5.0,K,,TR,,M,,
+b141,kidswear,beachwear,swimsuit,,maroon,K,,,22.0,43.0,,18.0,10.0,5.0,,,,B,,US,,XS,,0.107
+b146,womenswear,accessory,backpack,,natural,K,,,16.0,,3.0,13.0,6.0,11.0,48.0,,,W,,KR,,XS,,
+b48,clothing,suit,jacket,,amber,W,8.0,,2.0,,,,2.0,,7.0,1.0,77.0,M,,CN,,XL,,1.817
+b34,clothing,undergarments,underpants,,bondi blue,K,4.0,3.0,8.0,18.0,,,5.0,,42.0,17.0,,W,,CN,,L,,
+b54,womenswear,thermals,long-sleeved-top,,Ivory,K,,87.0,,,,6.0,2.0,,1.0,,2.0,W,,US,,M,,
+b46,baby,nightwear,pyjama,,dark grey,K,,,,,,,,,98.0,,,,,CN,,XL,,0.37799999999999995
+b80,baby,thermals,knitwear,,pink,K,,8.0,2.0,6.0,,7.0,66.0,8.0,,,,,,CN,SUM,XS,,0.46
+b74,clothing,outerwear,trousers,,gold,W,,4.0,,9.0,6.0,6.0,64.0,9.0,,,,B,,CN,MID,XXL,,
+b75,kidswear,outerwear,gloves,,black,K,,98.0,,,,,,,,,,K,,DE,WIN,L,,
+b133,home,home,curtain,,indigo,K,,,,94.0,,,,1.0,,2.0,1.0,,,CN,,XXL,,
+b52,baby,nightwear,pyjama,,wheat,K,,16.0,,46.0,10.0,14.0,,,1.0,,11.0,,,HK,,XS,,0.154
+b85,kidswear,accessory,backpack,,light brown,K,9.0,4.0,11.0,,,54.0,9.0,,9.0,,,Y,,US,,L,,
+b36,home,home,mat,,gray,W,4.0,,8.0,,,,3.0,,83.0,,,,,PK,,XXL,,2.32
+b52,home,home,mat,,teal,W,1.0,,2.0,1.0,1.0,87.0,,,1.0,1.0,2.0,,,CN,,XXL,,
+b145,menswear,undergarments,briefs,,gray,K,,13.0,,,3.0,,14.0,,,3.0,64.0,M,,KR,,S,,0.113
+b148,kidswear,headgear,cap,,amber,K,,,,,3.0,90.0,,,,3.0,3.0,Y,,TW,,XL,,
+b50,menswear,suit,coats,,bondi blue,W,,,,,,,,,100.0,,,M,,IT,AYR,S,,
+b81,home,home,curtain,,maroon,W,,11.0,,54.0,10.0,15.0,,1.0,6.0,,,,,KR,,M,,
+b96,menswear,costume,jacket,,Ivory,K,,,1.0,89.0,1.0,,,3.0,3.0,,,M,,IT,,L,,
+b75,clothing,uniform,gloves,,unknown,W,6.0,4.0,13.0,14.0,,9.0,4.0,,2.0,,44.0,B,,CN,MID,XS,,
+b31,home,home,sheets,,light grey,K,1.0,,2.0,15.0,10.0,32.0,,11.0,,,25.0,,,CN,,S,,
+b129,clothing,outerwear,coats,,colourful,K,,,,13.0,10.0,51.0,,14.0,,,10.0,M,,CN,AYR,XXL,,1.53
+b80,menswear,home,sheets,,black,W,1.0,,,92.0,,1.0,1.0,,1.0,1.0,,M,,CN,,XXL,,
+b28,womenswear,headgear,flat-cap,,dark green,K,16.0,2.0,,14.0,,40.0,6.0,,12.0,5.0,1.0,W,,KR,,L,,0.128
+b29,kidswear,outerwear,pants,,blue gray,W,,,12.0,,1.0,61.0,,,13.0,12.0,,Y,,US,,XS,,0.012
+b119,home,home,pillow,,pink,W,,1.0,12.0,12.0,,2.0,38.0,,13.0,14.0,4.0,,,TR,,XL,,
+b136,clothing,nightwear,pyjama,,blue,K,,6.0,,5.0,,,,,,2.0,85.0,W,,CN,,L,,0.537
+b98,home,home,sheets,,gray,W,4.0,,,,,,38.0,22.0,,35.0,,,,CN,,XXL,,0.67
+b33,kidswear,clothing,coats,,brown,K,,97.0,,,,,,,,,,B,,CN,MID,L,,2.128
+b102,clothing,home,sheets,,blue,K,,,3.0,1.0,,92.0,1.0,,,1.0,,U,,CN,,L,,
+b26,kidswear,outerwear,trousers,,mosaic,W,1.0,,37.0,,,38.0,8.0,,13.0,,1.0,B,,BD,MID,XL,,
+b38,baby,thermals,long-sleeved-top,,lime,K,,,,12.0,2.0,57.0,,14.0,,13.0,,,,KR,,L,,
+b85,home,home,curtain,,dark green,W,4.0,3.0,2.0,,3.0,,76.0,3.0,1.0,,4.0,,,TW,,XS,,0.215
+b141,menswear,thermals,pants,,peach,K,4.0,80.0,6.0,,3.0,,,1.0,2.0,,1.0,M,,CN,,XS,,0.023
+b53,menswear,accessory,backpack,,white,K,6.0,8.0,,,6.0,,7.0,4.0,9.0,,57.0,M,,HK,,XXL,,
+b12,menswear,nightwear,pyjama,,gray,K,,49.0,7.0,4.0,1.0,11.0,11.0,3.0,4.0,7.0,,M,,CN,,XS,,
+b0,home,home,pillow,,navy,K,9.0,1.0,,10.0,,72.0,3.0,,,,4.0,,,CN,,S,,
+b140,kidswear,undergarments,underpants,,violet,K,,,7.0,4.0,,10.0,10.0,,57.0,9.0,,Y,,TW,,XS,,
+b99,clothing,accessory,backpack,,Ivory,K,,89.0,,2.0,1.0,,,2.0,,2.0,1.0,G,,CN,,L,,
+b81,womenswear,footwear,socks,,gray,K,,,,,,1.0,,,,,97.0,W,,CN,,L,,0.033
+b13,womenswear,thermals,knitwear,,peach,K,6.0,,9.0,4.0,9.0,,2.0,,9.0,5.0,53.0,W,,IN,SUM,XXL,,
+b141,home,home,pillow,,Ivory,K,,,,,7.0,,,6.0,8.0,4.0,72.0,,,PK,,XS,,0.1
+b60,womenswear,beachwear,jean-shorts,,unknown,W,2.0,,1.0,3.0,5.0,83.0,,3.0,,,,W,,CN,SUM,XXL,,
+b62,baby,outerwear,pants,,light grey,K,13.0,35.0,6.0,,,,14.0,,13.0,,17.0,,,DE,,M,,
+b94,clothing,costume,dress,,white,K,2.0,6.0,4.0,75.0,,,3.0,4.0,,,3.0,M,,CN,,M,,0.29
+b105,kidswear,sportswear,gloves,,neon,K,,,4.0,5.0,2.0,4.0,84.0,,,,,K,,ES,SUM,XL,,0.158
+b98,menswear,nightwear,pyjama,,light grey,K,11.0,,,7.0,,12.0,55.0,,,7.0,5.0,M,,TR,,L,,0.37
+b132,baby,outerwear,jacket,,light brown,K,,,,,,,97.0,,1.0,,,,,BD,,XS,,
+b26,clothing,sportswear,pants,,mustard,K,11.0,,,7.0,,5.0,45.0,11.0,,18.0,,U,,CN,,XXL,,
+b51,menswear,sportswear,trousers,,silver,W,,,,56.0,,,22.0,21.0,,,,M,,CN,MID,XXL,,
+b127,kidswear,beachwear,shorts,,Ivory,K,40.0,,,,,60.0,,,,,,G,,CN,SUM,S,,0.174
+b146,womenswear,thermals,knitwear,,navy,K,,4.0,5.0,2.0,5.0,4.0,61.0,5.0,2.0,1.0,7.0,W,,CN,SUM,M,,0.243
+b55,clothing,costume,dress,,light grey,K,,8.0,2.0,,11.0,61.0,,3.0,,4.0,7.0,G,,CN,,L,,
+b6,home,home,sheets,,amber,K,9.0,65.0,,,,,5.0,16.0,,3.0,,,,TW,,S,,
+b46,clothing,accessory,backpack,,silver,K,3.0,82.0,,3.0,,,7.0,,,,3.0,U,,DE,,XXL,,0.731
+b37,baby,nightwear,pyjama,,dark green,K,14.0,3.0,11.0,2.0,11.0,,50.0,,6.0,,,,,CN,,XXL,,
+b99,menswear,costume,costume,,bondi blue,W,,,,,,,,1.0,,,98.0,M,,CN,,M,,
+b119,womenswear,hosiery,stockings,,green,K,,,,,,99.0,,,,,,W,,CN,,XXL,,0.027999999999999997
+b118,baby,baby,body,,grey,K,,7.0,8.0,35.0,1.0,,25.0,,,22.0,,,,DE,,XS,,
+b105,womenswear,undergarments,briefs,,gray,K,,,,,,,,,98.0,,,W,,KR,,S,,0.09
+b110,kidswear,suit,gloves,,silver,W,5.0,,7.0,59.0,,14.0,,2.0,,5.0,5.0,B,,CN,MID,XXL,,0.16
+b128,home,home,towel,,silver,K,,,,,10.0,,,,79.0,10.0,,,,CN,,XL,,0.433
+b9,menswear,undergarments,underpants,,bondi blue,K,,,1.0,,,96.0,,,,,,M,,TR,,XL,,
+b139,kidswear,thermals,trousers,,red,K,8.0,,14.0,,,11.0,51.0,6.0,7.0,,,Y,,US,MID,XS,,0.426
+b7,clothing,uniform,gloves,,bondi blue,W,14.0,44.0,10.0,5.0,,,2.0,7.0,9.0,,5.0,B,,CN,SUM,XL,,
+b1,home,home,towel,,yellow,W,9.0,,,,,,80.0,2.0,,,8.0,,,DE,,XL,,
+b128,menswear,nightwear,pyjama,,maroon,K,,,,66.0,,,7.0,1.0,,24.0,,M,,US,,XS,,
+b88,womenswear,nightwear,pyjama,,peach,K,,1.0,12.0,,1.0,2.0,73.0,,6.0,2.0,,W,,CN,,S,,
+b85,baby,thermals,long-sleeved-top,,grey,K,2.0,,3.0,2.0,,,,5.0,,4.0,82.0,,,US,,S,,
+b87,clothing,clothing,knitwear,,Ivory,K,,6.0,6.0,7.0,5.0,6.0,60.0,6.0,,,,M,,CN,SUM,XL,,
+b34,home,home,sheets,,blue,K,24.0,22.0,,14.0,7.0,,32.0,,,,,,,DE,,M,,
+b55,clothing,nightwear,pyjama,,grey,K,,,9.0,60.0,,12.0,13.0,,,,4.0,W,,VN,,L,,
+b117,clothing,headgear,cap,,dark green,K,,,5.0,,17.0,6.0,60.0,,,10.0,,Y,,CN,,M,,0.051
+b5,home,home,pillow,,dark grey,K,,,16.0,,,,67.0,7.0,9.0,,,,,CN,,XXL,,0.105
+b70,clothing,undergarments,underpants,,light grey,K,,98.0,,,,,,,,,,M,,BD,,L,,0.032
+b136,kidswear,footwear,socks,,light grey,K,7.0,9.0,3.0,12.0,,4.0,54.0,,8.0,,,G,,CN,,M,,
+b55,home,home,mat,,black,W,16.0,,10.0,58.0,,,,,,14.0,,,,CN,,S,,1.275
+b134,clothing,clothing,top,,gray,K,,89.0,2.0,1.0,,2.0,,1.0,,,2.0,U,,CN,,XXL,,
+b80,baby,baby,body,,pink,K,,33.0,29.0,,11.0,,1.0,,9.0,,14.0,,,CN,,XS,,0.018000000000000002
+b98,baby,outerwear,trousers,,amber,W,,66.0,,4.0,,8.0,2.0,,,10.0,8.0,,,CN,AYR,XS,,0.718
+b106,menswear,costume,jacket,,mustard,K,13.0,12.0,,,26.0,48.0,,,,,,M,,PK,,XS,,1.207
+b77,baby,baby,body,,lime,K,,10.0,6.0,58.0,,,5.0,8.0,1.0,8.0,,,,CN,,L,,
+b91,kidswear,uniform,gloves,,violet,W,3.0,48.0,3.0,,8.0,12.0,4.0,,5.0,,13.0,B,,KR,SUM,XXL,,0.10099999999999999
+b138,menswear,swimwear,swimsuit,,orange,K,,,,35.0,23.0,23.0,12.0,4.0,,1.0,,M,,CN,,M,,0.13
+b128,kidswear,undergarments,briefs,,navy,K,11.0,,,66.0,,,8.0,,7.0,,5.0,K,,CN,,L,,
+b43,clothing,thermals,skirts,,orange,K,,,,39.0,23.0,,18.0,,14.0,,4.0,G,,CN,,XS,,
+b77,baby,nightwear,pyjama,,neon,K,,,13.0,,12.0,,58.0,,15.0,,,,,CN,,M,,
+b130,womenswear,women-undergarments,bra,,gray,K,8.0,67.0,2.0,7.0,,4.0,,4.0,,5.0,,W,,CN,,M,,0.057
+b135,kidswear,swimwear,swimsuit,,pink,K,17.0,,19.0,49.0,,12.0,,,,1.0,,Y,,KR,,XL,,0.08800000000000001
+b87,baby,nightwear,pyjama,,yellow,K,,,1.0,3.0,,4.0,,,79.0,4.0,5.0,,,KR,,S,,0.17600000000000002
+b148,clothing,costume,costume,,unbleached,K,,,,,7.0,5.0,14.0,20.0,50.0,2.0,,M,,CN,,M,,
+b100,womenswear,women-beachwear,bikin,,dark grey,K,2.0,,11.0,,,52.0,33.0,,,,,W,,CN,SUM,L,,
+b52,clothing,clothing,top,,pink,K,,,,95.0,1.0,,,1.0,,1.0,,U,,CN,,XL,,

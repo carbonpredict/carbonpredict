@@ -23,14 +23,23 @@ def prepare_data(model_name, dataset_id=None):
     return X, y
 
 
-def do_train(model_name, dataset_id=None, save_to=None):
+def do_train(model_name, dataset_id=None, base_dir=None):
     X, y = prepare_data(model_name, dataset_id)
-    AVAILABLE_MODELS[model_name]().train(X, y, save_to)
+    AVAILABLE_MODELS[model_name]().train(X, y, base_dir)
 
 
 def do_eval(model_name, dataset_id=None):
     X, y = prepare_data(model_name, dataset_id)
     AVAILABLE_MODELS[model_name]().eval(X, y)
+
+def do_prediction(model_name, csv_file, base_dir):
+    model = AVAILABLE_MODELS[model_name]()
+    model.load(base_dir)
+
+    X = pd.read_csv(csv_file)
+
+    return model.predict(X)
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Carbon Models')
@@ -39,12 +48,18 @@ if __name__ == "__main__":
                                     help='Run subcommand --help for details',
                                     dest="subcommand")
 
+    models_parser = subparsers.add_parser('models')
+    
     train_parser = subparsers.add_parser('train')
     train_parser.add_argument('model', type=str, help='Select model')
     train_parser.add_argument('--eval', action="store_true", help='Evaluate model')
     
-    server_parser = subparsers.add_parser('run_server')
-    # TODO: add server functionality
+    predict_parser = subparsers.add_parser('predict')
+    predict_parser.add_argument('model', type=str, help='Select model')
+    predict_parser.add_argument('csv_file', type=str, help='CSV file')
+    
+    server_parser = subparsers.add_parser('run-server')
+    # TODO: add server functionalityls
 
     if len(sys.argv) <= 1:
         parser.print_help()
@@ -52,14 +67,28 @@ if __name__ == "__main__":
     
     args = parser.parse_args()
 
+    base_dir = os.environ.get('MNT_DIR', './')
+
     if args.subcommand == "train":
         if args.model in AVAILABLE_MODELS:
             if args.eval:
                 do_eval(args.model)
             else:
-                do_train(args.model)
+                do_train(args.model, base_dir=base_dir)
         else:
             print(f"Error: model {args.model} is not available")
+    elif args.subcommand == "predict":
+        if args.model in AVAILABLE_MODELS:
+            predictions = do_prediction(args.model, args.csv_file, base_dir)
+            print(predictions)
+        else:
+            print(f"Error: model {args.model} is not available")
+    elif args.subcommand == "models":
+        print("Available models:", list(AVAILABLE_MODELS.keys()))
+        sys.exit(0)
+    elif args.subcommand == "run-server":
+        print("Not implemented")
+        sys.exit(0)
 
 
 

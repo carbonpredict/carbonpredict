@@ -1,16 +1,30 @@
 
 from abc import ABC, abstractmethod
 
-class CarbonModelBase(ABC):    
+class CarbonModelBase(ABC):
+
+    
     @abstractmethod
-    def train(X, y, save_to=None):
+    def __init__(self):
+        pass
+
+    @abstractmethod
+    def load(base_dir):
+        """
+        Load existing model
+        @param filename name of the existing model
+        """
+        pass
+
+    @abstractmethod
+    def train(X, y, base_dir=None):
         """
         Train and save the model to
         a given location. 
 
         @param X Training data
         @param y Training labels
-        @param save_to Directory to save model
+        @param base_dir Directory to save the model
         """
         pass
 
@@ -25,6 +39,17 @@ class CarbonModelBase(ABC):
         """
         pass
 
+     
+    @abstractmethod
+    def predict(X):
+        """
+        Predict from loaded model. Make sure
+        to load() or train() the model first.
+
+        @param X Data to predict from.
+        @return prediction 
+        """
+        pass
 
 # Import your models here
 from .dummy import DummyModel

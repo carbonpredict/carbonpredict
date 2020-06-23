@@ -6,25 +6,9 @@ from sklearn.metrics import mean_squared_error, r2_score
 
 class LGBMDefault(CarbonModelBase):
 
-    def __preprocess(self, X):
-        cat_cols = ["category-1", "category-2", "category-3", 
-            "size", "made_in", "gender", "colour", 
-            "brand", "fabric_type", "season"]
-
-        X[cat_cols] = X[cat_cols].astype("category")
-        X = X.drop("weight", axis=1)
-
-        return X
-
-
-    def train(self, X, y, save_to=None):
-        print("Train")
-
-
-    def eval(self, X, y):
-        X = self.__preprocess(X)
-
-        params = {'bagging_fraction': 1.0,
+    def __init__(self):
+        self.models = []
+        self.params = {'bagging_fraction': 1.0,
                 'bagging_freq': 1,
                 'boosting_type': 'gbdt',
                 'colsample_bytree': 0.4,
@@ -37,8 +21,24 @@ class LGBMDefault(CarbonModelBase):
                 'num_leaves': 300,
                 'objective': 'regression',
                 'seed': 42}
-        
-        kf = KFold(n_splits=5, shuffle=True)
+        self.n_splits = 5
+
+
+    def __preprocess(self, X):
+        cat_cols = ["category-1", "category-2", "category-3", 
+            "size", "made_in", "gender", "colour", 
+            "brand", "fabric_type", "season"]
+
+        X[cat_cols] = X[cat_cols].astype("category")
+        X = X.drop("weight", axis=1)
+
+        return X
+
+
+    def __train(self, X, y):
+        X = self.__preprocess(X)
+
+        kf = KFold(n_splits=self.n_splits, shuffle=True)
         preds = np.zeros(len(X))
         nrounds = 5000
         early_stopping_rounds = 200
@@ -52,7 +52,7 @@ class LGBMDefault(CarbonModelBase):
             trn_data = lgb.Dataset(X_train, label=y_train)
             val_data = lgb.Dataset(X_valid, label=y_valid)
 
-            lgb_clf = lgb.train(params,
+            lgb_clf = lgb.train(self.params,
                             trn_data,
                             nrounds,
                             valid_sets = [trn_data, val_data],
@@ -66,5 +66,36 @@ class LGBMDefault(CarbonModelBase):
         s_rmse = np.sqrt(mean_squared_error(y, preds))
         s_r2 = r2_score(y, preds)
         
+        return models, s_r2
+
+
+    def __get_filename(self, fold):
+        return f"{self.__class__.__name__}_{fold}.model"
+
+
+    def load(self, base_dir):
+        self.models = []
+
+        for idx in range(self.n_splits):
+            self.models.append(lgb.Booster(model_file=f"{base_dir}/{self.__get_filename(idx)}"))
+
+
+    def train(self, X, y, base_dir=None):
+        models, _ = self.__train(X, y)
+
+        for idx, model in enumerate(models):
+            model.save_model(f"{base_dir}/{self.__get_filename(idx)}", 
+                            num_iteration=model.best_iteration)
+
+
+    def eval(self, X, y):
+        _, s_r2 = self.__train(X, y)
+
         return s_r2
+
+
+    def predict(self, X):
+        X = self.__preprocess(X)
+        X = X.drop("co2_total", axis=1)
+        return list(np.mean([model.predict(X) for model in self.models], axis=0))
 
