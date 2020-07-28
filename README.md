@@ -34,7 +34,7 @@ To predict a CO2e value using a trained model, run a command like `docker-compos
 brand,category-1,category-2,category-3,co2_total,colour,fabric_type,ftp_acrylic,ftp_cotton,ftp_elastane,ftp_linen,ftp_other,ftp_polyamide,ftp_polyester,ftp_polypropylene,ftp_silk,ftp_viscose,ftp_wool,gender,label,made_in,season,size,unspsc_code,weight
 
 ### Run server
-To run the demo server, which offers an HTTP endpoint for calling the predict command, run `docker-compose run carbon run-server`. *Running the server through Docker has not been implemented yet.*
+To run the demo server, which offers an HTTP endpoint for calling the predict command, run `docker-compose run --service-ports carbon run-server`. *The current implementation returns a randomly generated response value. To be done: making the server call the predict function.*
 
 ## Used source data
 The used source data is published in the [emission-sample-data repository](https://github.com/Compensate-Operations/emission-sample-data) by [Compensate](https://compensate.com/).
