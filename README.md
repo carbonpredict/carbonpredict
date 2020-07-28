@@ -17,6 +17,24 @@ For loading the source data, there are two approaches in the notebooks:
 
 *Dockerfile* at the root contains the definition of the container for Docker.
 
+## How to run it
+The solution is dockerized. Install Docker on your machine, instructions at the [Docker get started section](https://docs.docker.com/get-started/).
+
+### Build image
+Currently the image is not offered through Dockerhub. Build the image locally by cloning this repository, navigating to the repo's root folder and running the command `docker build -t carbonpred .`. This builds the Docker image with the tag *carbonpred*. The other docker commands are run using this image.
+
+### List models
+To list the available models, run `docker run carbonpred models`.
+
+### Train model
+To train a model (here *lgbm_default*, a gradient boosting model) with the source data, run `docker run carbonpred train lgbm_default`. Substitute the model name as the last parameter in the command.
+
+### Predict
+To predict a CO2e value using a trained model, run `docker run carbonpred predict`. *Predictions through Docker has not been implemented yet.*
+
+### Run server
+To run the demo server, which offers an HTTP endpoint for calling the predict command, run `docker run carbonpred run-server`. *Running the server through Docker has not been implemented yet.*
+
 ## Used source data
 The used source data is published in the [emission-sample-data repository](https://github.com/Compensate-Operations/emission-sample-data) by [Compensate](https://compensate.com/).
 
