@@ -1,6 +1,7 @@
 data
 */emission-sample-data
 */.ipynb_checkpoints
+mnt/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

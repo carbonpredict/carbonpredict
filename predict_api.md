@@ -14,13 +14,13 @@
 | ftp_cotton | Fibre type percentage of Cotton
 | ftp_elastane | Fibre type percentage of Elastene
 | ftp_linen | Fibre type percentage of Linen
+| ftp_other | Fibre type percentage of other materials
 | ftp_polyamide | Fibre type percentage of Polyamide
 | ftp_polyester | Fibre type percentage of Polyester
 | ftp_polypropylene | Fibre type percentage of Polypropylene
 | ftp_silk | Fibre type percentage of Silk
 | ftp_viscose | Fibre type percentage of Viscose
 | ftp_wool | Fibre type percentage of Wool
-| ftp_other | Fibre type percentage of other materials
 | gender | Gender code, see gender mappings below
 | label | Product label if we have one
 | made_in | Made in country, see ISO 3166-1 alpha-2 (e.g. "FI", "GR")
