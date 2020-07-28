@@ -21,19 +21,20 @@ For loading the source data, there are two approaches in the notebooks:
 The solution is dockerized. Install Docker on your machine, instructions at the [Docker get started section](https://docs.docker.com/get-started/).
 
 ### Build image
-Currently the image is not offered through Dockerhub. Build the image locally by cloning this repository, navigating to the repo's root folder and running the command `docker build -t carbonpred .`. This builds the Docker image with the tag *carbonpred*. The other docker commands are run using this image.
+Currently the image is not offered through Dockerhub. Build the image locally by cloning this repository, navigating to the repo's root folder and running the command `docker build -t carbon .`. This builds the Docker image with the tag *carbon*. The other docker commands are run using this image.
 
 ### List models
-To list the available models, run `docker run carbonpred models`.
+To list the available models, run `docker-compose run carbon models`.
 
 ### Train model
-To train a model (here *lgbm_default*, a gradient boosting model) with the source data, run `docker run carbonpred train lgbm_default`. Substitute the model name as the last parameter in the command.
+To train a model (here *lgbm_default*, a gradient boosting model) with the source data, first create a subdirectory */mnt* at the root of the repository and then run run `docker-compose run carbon train lgbm_default`. Substitute the model name as the last parameter in the command. This will mount your subdirectory */mnt* into the container, train a model and save it to the subdirectory.
 
 ### Predict
-To predict a CO2e value using a trained model, run `docker run carbonpred predict`. *Predictions through Docker has not been implemented yet.*
+To predict a CO2e value using a trained model, run a command like `docker-compose run carbon predict lgbm_default ./testdata/test.csv`, where the last two parameters are a trained model to use and the location of the csv file to do the predictions for. The columns of the CSV file must currently be in the exact order (and including the empty target column *co2_total*):
+brand,category-1,category-2,category-3,co2_total,colour,fabric_type,ftp_acrylic,ftp_cotton,ftp_elastane,ftp_linen,ftp_other,ftp_polyamide,ftp_polyester,ftp_polypropylene,ftp_silk,ftp_viscose,ftp_wool,gender,label,made_in,season,size,unspsc_code,weight
 
 ### Run server
-To run the demo server, which offers an HTTP endpoint for calling the predict command, run `docker run carbonpred run-server`. *Running the server through Docker has not been implemented yet.*
+To run the demo server, which offers an HTTP endpoint for calling the predict command, run `docker-compose run carbon run-server`. *Running the server through Docker has not been implemented yet.*
 
 ## Used source data
 The used source data is published in the [emission-sample-data repository](https://github.com/Compensate-Operations/emission-sample-data) by [Compensate](https://compensate.com/).
