@@ -3,3 +3,4 @@ pandas
 sklearn
 lightgbm
 bayesian-optimization
+flask

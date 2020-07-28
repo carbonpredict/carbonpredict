@@ -2,6 +2,8 @@
 from flask import Flask, jsonify, abort, make_response, request, url_for
 from werkzeug.utils import secure_filename
 import random
+import os
+
 """
 This is an initial inplementtion of a REST based API and server for the CCaaS service.
 As input the following json format with example values is expected. 
@@ -96,6 +98,9 @@ def predict():
     
     return CO2E, 201
 
+def run():
+    flask_run_host = os.environ.get('FLASK_RUN_HOST', '0.0.0.0')
+    app.run(host=flask_run_host, debug=True) 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    run()

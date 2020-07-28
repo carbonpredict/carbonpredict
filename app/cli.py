@@ -2,7 +2,8 @@ import os, sys
 import argparse
 import pandas as pd
 from models import AVAILABLE_MODELS
-
+from models import AVAILABLE_MODELS
+from server import cpapi
 
 def get_data(dataset_id=None):
     clone_dir = "/tmp/emission_data"
@@ -59,8 +60,7 @@ if __name__ == "__main__":
     predict_parser.add_argument('csv_file', type=str, help='CSV file')
     
     server_parser = subparsers.add_parser('run-server')
-    # TODO: add server functionalityls
-
+    
     if len(sys.argv) <= 1:
         parser.print_help()
         sys.exit(0)
@@ -87,8 +87,5 @@ if __name__ == "__main__":
         print("Available models:", list(AVAILABLE_MODELS.keys()))
         sys.exit(0)
     elif args.subcommand == "run-server":
-        print("Not implemented")
-        sys.exit(0)
-
-
-
+        print("Starting web server...")
+        cpapi.run()
