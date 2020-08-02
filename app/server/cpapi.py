@@ -93,6 +93,7 @@ def predict():
     print('Model loaded')
     CO2e = do_prediction_with_params(model, product)
     print('CO2e prediction complete, returning result')
+    print(CO2e)
     return CO2e, 201
 
     """
