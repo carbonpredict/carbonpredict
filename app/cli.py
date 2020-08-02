@@ -41,6 +41,22 @@ def do_prediction(model_name, csv_file, base_dir):
 
     return model.predict(X)
 
+def load_model(model_name):
+    base_dir = os.environ.get('MNT_DIR', './')
+    model = AVAILABLE_MODELS[model_name]()
+    model.load(base_dir)
+    return model
+
+def do_prediction_with_params(model, params):
+    X = pd.DataFrame.from_records([params])
+    print('Dataframe before reindexing')
+    print(X)
+    X = X.reindex(sorted(X.columns), axis=1)
+    print('Dataframe for prediction')
+    print(X)
+    print('Data types')
+    print(X.dtypes)
+    return model.predict(X)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Carbon Models')
