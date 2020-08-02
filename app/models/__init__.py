@@ -54,8 +54,10 @@ class CarbonModelBase(ABC):
 # Import your models here
 from .dummy import DummyModel
 from .lgbm_default import LGBMDefault
+from .k_nearest_neighbors import KNearestNeighbors
 
 # Add your model to AVAILABLE_MODELS as name: Model entry. 
 # Name is used in the command line to select the model.
 AVAILABLE_MODELS = {'dummy': DummyModel, 
+                    'k_nearest_neighbors': KNearestNeighbors,
                     'lgbm_default': LGBMDefault}
