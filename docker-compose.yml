@@ -5,3 +5,4 @@ services:
            image: carbon
            volumes:
              - ./mnt:/usr/app/mnt
+             - ./emission_data:/tmp/emission_data

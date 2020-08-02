@@ -12,9 +12,19 @@ def get_data(dataset_id=None):
     content = sorted(filter(lambda x: x.endswith(".csv"), os.listdir(clone_dir)))
     return pd.concat((pd.read_csv(f'{clone_dir}/{f}') for f in content))
 
+def get_data_from_dir(dataset_id=None):
+    data_dir = "/tmp/emission_data"
+    print(f"Using source data from local dir {data_dir}")
+    content = sorted(filter(lambda x: x.endswith(".csv"), os.listdir(data_dir)))
+    return pd.concat((pd.read_csv(f'{data_dir}/{f}') for f in content))
 
-def prepare_data(model_name, dataset_id=None):
-    X = get_data(dataset_id)
+def prepare_data(model_name, dataset_id=None, local_data=False):
+    X = None
+    if (local_data):
+        X = get_data_from_dir(dataset_id)
+    else:
+        X = get_data(dataset_id)
+    
     X = X[~X["co2_total"].isna()]
 
     y = X["co2_total"].copy()
@@ -22,15 +32,15 @@ def prepare_data(model_name, dataset_id=None):
 
     return X, y
 
-
-def do_train(model_name, dataset_id=None, base_dir=None):
-    X, y = prepare_data(model_name, dataset_id)
+def do_train(model_name, dataset_id=None, base_dir=None, local_data=False):
+    X, y = prepare_data(model_name, dataset_id, local_data)
     AVAILABLE_MODELS[model_name]().train(X, y, base_dir)
 
 
-def do_eval(model_name, dataset_id=None):
-    X, y = prepare_data(model_name, dataset_id)
-    AVAILABLE_MODELS[model_name]().eval(X, y)
+def do_eval(model_name, dataset_id=None, local_data=False):
+    X, y = prepare_data(model_name, dataset_id, local_data)
+    r2_score = AVAILABLE_MODELS[model_name]().eval(X, y)
+    print(f'Model {model_name} evaluated, r2-score {r2_score}')
 
 def do_prediction(model_name, csv_file, base_dir):
     model = AVAILABLE_MODELS[model_name]()
@@ -53,6 +63,7 @@ if __name__ == "__main__":
     train_parser = subparsers.add_parser('train')
     train_parser.add_argument('model', type=str, help='Select model')
     train_parser.add_argument('--eval', action="store_true", help='Evaluate model')
+    train_parser.add_argument('--local_data', action="store_true", help='Use csv source data in directory /tmp/emission_data')
     
     predict_parser = subparsers.add_parser('predict')
     predict_parser.add_argument('model', type=str, help='Select model')
@@ -72,9 +83,15 @@ if __name__ == "__main__":
     if args.subcommand == "train":
         if args.model in AVAILABLE_MODELS:
             if args.eval:
-                do_eval(args.model)
+                if (args.local_data):
+                    do_eval(args.model, local_data=True)
+                else:
+                    do_eval(args.model)
             else:
-                do_train(args.model, base_dir=base_dir)
+                if (args.local_data):
+                    do_train(args.model, base_dir=base_dir, local_data=True)
+                else:
+                    do_train(args.model, base_dir=base_dir)
         else:
             print(f"Error: model {args.model} is not available")
     elif args.subcommand == "predict":
