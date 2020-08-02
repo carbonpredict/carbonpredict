@@ -23,5 +23,5 @@
     "size": "M",
     "unspsc_code": "",
     "weight": "0.029",
-    "ML-model": ""
+    "ML-model": "lgbm_default"
 }

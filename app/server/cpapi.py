@@ -1,6 +1,7 @@
 #!flask/bin/python
 from flask import Flask, jsonify, abort, make_response, request, url_for
 from werkzeug.utils import secure_filename
+from cli import do_train, do_prediction_with_params, load_model
 import random
 import os
 
@@ -78,12 +79,24 @@ def predict():
     "size": request.json["size"],
     "unspsc_code": request.json["unspsc_code"],
     "weight": request.json["weight"],
-    "ML-model": request.json["ML-model"],  # delaut ML model is xyz
+    "ML-model": request.json["ML-model"],  # defaut ML model is xyz
     }
 
-    # load_model(product["ML-model"])
-    # CO2E = do_prediction(product["category-3"])
+    product["co2_total"] = None
+    ml_model = product.pop("ML-model", None)
+    if (ml_model == None or ml_model == ""):
+        print('Loading default model: LGBM')
+        ml_model = 'lgbm_default'
+    else:
+        print(f'Loading model: {ml_model}')
+    model = load_model(ml_model)
+    print('Model loaded')
+    CO2e = do_prediction_with_params(model, product)
+    print('CO2e prediction complete, returning result')
+    print(CO2e)
+    return CO2e, 201
 
+    """
     # This is just here to give a random response until real responses work
     co2e = random.randint(150,666)
     ci = round(co2e/10)
@@ -97,6 +110,7 @@ def predict():
         }
     
     return CO2E, 201
+    """
 
 def run():
     flask_run_host = os.environ.get('FLASK_RUN_HOST', '0.0.0.0')

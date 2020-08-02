@@ -1,6 +1,7 @@
 import os, sys
 import argparse
 import pandas as pd
+import numpy as np
 from models import AVAILABLE_MODELS
 from models import AVAILABLE_MODELS
 from server import cpapi
@@ -41,6 +42,39 @@ def do_prediction(model_name, csv_file, base_dir):
 
     return model.predict(X)
 
+def load_model(model_name):
+    base_dir = os.environ.get('MNT_DIR', './')
+    model = AVAILABLE_MODELS[model_name]()
+    model.load(base_dir)
+    return model
+
+def do_prediction_with_params(model, params):
+    X = pd.DataFrame.from_records([params])
+    print('Dataframe before reindexing')
+    print(X)
+    X = X.reindex(sorted(X.columns), axis=1)
+    print('Dataframe after reindexing')
+    print(X)
+    
+    # Replace whitespace-only strings with NaN
+    X = X.replace(r'^\s*$', np.nan, regex=True)
+    print('Dataframe NaN replacements')
+    print(X)
+    
+    # Some initial data type conversions: ideally the models should be robust enough to take care of this, but trying it here for now
+    print('Initial data types')
+    print(X.dtypes)
+    print('Altering data types')
+    # Note: in the first dataset completely empty columns label and unspc_code are defined as bools here (lgbm is apparently using them and breaks if they are not int, float or bool). 
+    # They should be treated some other way. The K-NN model drops them before further processing, so data type does not matter for it.
+    X = X.astype({'ftp_acrylic': 'float64', 'ftp_cotton': 'float64', 'ftp_elastane': 'float64', 'ftp_linen': 'float64', 'ftp_other': 'float64', 'ftp_polyamide': 'float64', 'ftp_polyester': 'float64', 'ftp_polypropylene': 'float64', 'ftp_silk': 'float64', 'ftp_viscose': 'float64', 'ftp_wool': 'float64', 'label': 'bool', 'unspsc_code': 'bool'})
+    print('Altered data types')
+    print(X.dtypes)    
+
+    prediction = model.predict(X)
+    # The models return a list of predictions as float64. For the server, we are only predicting one sample and need to return a string (not a list), so return the first and only member of the list as a string.
+    prediction = str(prediction[0])
+    return prediction
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Carbon Models')
