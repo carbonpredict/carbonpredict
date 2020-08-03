@@ -5,7 +5,9 @@ Machine learning pipeline and model to predict CO2e of products
 *Goal for project ending 8/2020*: The application is a machine learning pipeline that can ingest a source data set, train a model on it and then be able to predict CO2 emission values for clothing products.
 
 ## Repository contents
-*Notebooks* contains Jupyter Notebooks used in the project. 
+*App* contains the python source code for the main application. For instruction on running the app, see section *How to run it*. 
+
+*Notebooks* contains Jupyter Notebooks used in experimenting with ML-models and doing visualizations the project. 
 
 For loading the source data, there are two approaches in the notebooks:
 - Some notebooks (e.g. Clustering.ipynb) rely on the source data being in the folder */data* under the repository root (data is not uploaded to GitHub). This is handy if you are running the notebook locally and already have downloaded and unzipped the source data.
@@ -13,9 +15,9 @@ For loading the source data, there are two approaches in the notebooks:
 
 *Visualizations* contains some visualizations (png images) of the source data. These have been output from the notebook Visualizations.ipynb.
 
-*App* contains the main application (template at first).
+*Dockerfile*, *docker-compose.yml* and *requirements.txt* at the root contain the Docker definitions of the app. The folders */emission_data* and */mnt* are used by the Dockerized version of the app for storing source emission data and storing the trained models (respectively). The folders are mounted into the container.
 
-*Dockerfile* at the root contains the definition of the container for Docker.
+*README.md*, *predict_api.md* are general documentation.
 
 ## How to run it
 The solution is dockerized. Install Docker on your machine, instructions at the [Docker get started section](https://docs.docker.com/get-started/).
@@ -46,7 +48,7 @@ The used source data is published in the [emission-sample-data repository](https
 See *[prediction API definition](predict_api.md)*.
 
 ### Admin API
-To be defined.
+To be defined. Admin API will be used for training selected models on selected source data.
 
 ## Possible future features
 - Extend software to support other product categories
