@@ -2,7 +2,10 @@ version: '3.5'
 
 services:
         carbon:
+           container_name: carbonpredict
            image: carbon
+           ports:
+             - "5000:5000"
            volumes:
              - ./mnt:/usr/app/mnt
              - ./emission_data:/tmp/emission_data

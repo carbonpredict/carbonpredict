@@ -1,8 +1,10 @@
 import os, sys
 import argparse
 import pandas as pd
+import numpy as np
 from models import AVAILABLE_MODELS
-
+from models import AVAILABLE_MODELS
+from server import cpapi
 
 def get_data(dataset_id=None):
     clone_dir = "/tmp/emission_data"
@@ -50,6 +52,28 @@ def do_prediction(model_name, csv_file, base_dir):
 
     return model.predict(X)
 
+def load_model(model_name):
+    base_dir = os.environ.get('MNT_DIR', './')
+    model = AVAILABLE_MODELS[model_name]()
+    model.load(base_dir)
+    return model
+
+def do_prediction_with_params(model, params):
+    X = pd.DataFrame.from_records([params])
+    X = X.reindex(sorted(X.columns), axis=1)
+    
+    # Replace whitespace-only strings with NaN
+    X = X.replace(r'^\s*$', np.nan, regex=True)
+    
+    # Some initial data type conversions: ideally the models should be robust enough to take care of this, but trying it here for now
+    # Note: in the first dataset completely empty columns label and unspc_code are defined as bools here (lgbm is apparently using them and breaks if they are not int, float or bool). 
+    # They should be treated some other way. The K-NN model drops them before further processing, so data type does not matter for it.
+    X = X.astype({'ftp_acrylic': 'float64', 'ftp_cotton': 'float64', 'ftp_elastane': 'float64', 'ftp_linen': 'float64', 'ftp_other': 'float64', 'ftp_polyamide': 'float64', 'ftp_polyester': 'float64', 'ftp_polypropylene': 'float64', 'ftp_silk': 'float64', 'ftp_viscose': 'float64', 'ftp_wool': 'float64', 'label': 'bool', 'unspsc_code': 'bool'})
+
+    prediction = model.predict(X)
+    # The models return a list of predictions as float64. For the server, we are only predicting one sample and need to return a string (not a list), so return the first and only member of the list as a string.
+    prediction = str(prediction[0])
+    return prediction
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Carbon Models')
@@ -70,8 +94,7 @@ if __name__ == "__main__":
     predict_parser.add_argument('csv_file', type=str, help='CSV file')
     
     server_parser = subparsers.add_parser('run-server')
-    # TODO: add server functionalityls
-
+    
     if len(sys.argv) <= 1:
         parser.print_help()
         sys.exit(0)
@@ -104,8 +127,5 @@ if __name__ == "__main__":
         print("Available models:", list(AVAILABLE_MODELS.keys()))
         sys.exit(0)
     elif args.subcommand == "run-server":
-        print("Not implemented")
-        sys.exit(0)
-
-
-
+        print("Starting web server...")
+        cpapi.run()
