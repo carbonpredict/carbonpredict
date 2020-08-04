@@ -40,6 +40,12 @@ brand,category-1,category-2,category-3,co2_total,colour,fabric_type,ftp_acrylic,
 ### Run server
 To run the demo server, which offers an HTTP endpoint for calling the predict command, run `docker-compose run --service-ports carbon run-server`. Then, you can send the product parameters in JSON format in an HTTP POST message. Example using curl (to be run inside directory */testdata*) using example data in file */testdata/wsocks.json*: `curl -i -H "Content-Type: application/json" -X POST --data "@wsocks.json" http://localhost:5000/ccaas/api/v0.1/predict`   
 
+## Current machine learning models
+
+**Gradient boosting** (*lgbm_default*):  Root mean squared error (RMSE) = 12.5, r2 (coefficient of determination) = 0.7935093722105526. Makes on average a 12,5 gram error on a single CO2e prediction.
+
+**Simple K-nearest neighbors** (*k_nearest_neighbors*) (using only 3 categories, fabric_type & size):  RMSE = 19.476921284404497, R2 = 0.5095385877102603. Makes on average a 19,5 gram error on a single CO2e prediction
+
 ## Used source data
 The used source data is published in the [emission-sample-data repository](https://github.com/Compensate-Operations/emission-sample-data) by [Compensate](https://compensate.com/).
 
