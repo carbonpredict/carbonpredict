@@ -29,9 +29,9 @@ Currently the image is not offered through Dockerhub. Build the image locally by
 To list the available models, run `docker-compose run carbon models`.
 
 ### Train model
-To train a model (here *lgbm_default*, a gradient boosting model) with the source data, first create a subdirectory */mnt* at the root of the repository and then run run `docker-compose run carbon train lgbm_default`. Substitute the model name as the last parameter in the command. This will mount your subdirectory */mnt* into the container, train a model and save it to the subdirectory.
+To train a model (here *lgbm_default*, a gradient boosting model) with the source data, run `docker-compose run carbon train lgbm_default`. Substitute the model name as the last parameter in the command. This will mount your subdirectory */mnt_models* into the container, train a model and save it to the subdirectory.
 
-As default, the train command clones the source data files (about 1 GB) into the container from a remote git repository. If you have the CSV-format source data files on your local computer, you can copy them into the subfolder */emission_data* and use the switch *--local_data* to use local data (from a docker-mounted directory) instead of cloning the data into the container. Example using the switch: `docker-compose run carbon train lgbm_default --local_data`
+As default, the train command clones the source data files (about 1 GB) into the container from a remote git repository. If you have the CSV-format source data files on your local computer, you can copy them into the subfolder */mnt_emission_data* and use the switch *--local_data* to use local data (from a docker-mounted directory) instead of cloning the data into the container. Example using the switch: `docker-compose run carbon train lgbm_default --local_data`
 
 ### Predict
 To predict a CO2e value using a trained model, run a command like `docker-compose run carbon predict lgbm_default ./testdata/test.csv`, where the last two parameters are a trained model to use and the location of the csv file to do the predictions for. The columns of the CSV file must currently be in the exact order (and including the empty target column *co2_total*):

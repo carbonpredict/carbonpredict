@@ -1,10 +1,10 @@
 data
 */emission-sample-data
 */.ipynb_checkpoints
-mnt/*
-!mnt/readme.txt
-emission_data/*
-!emission_data/readme.txt
+mnt_models/*
+!mnt_models/readme.txt
+mnt_emission_data/*
+!mnt_emission_data/readme.txt
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

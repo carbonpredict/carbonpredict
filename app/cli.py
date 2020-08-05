@@ -14,16 +14,15 @@ def get_data(dataset_id=None):
     content = sorted(filter(lambda x: x.endswith(".csv"), os.listdir(clone_dir)))
     return pd.concat((pd.read_csv(f'{clone_dir}/{f}') for f in content))
 
-def get_data_from_dir(dataset_id=None):
-    data_dir = "/tmp/emission_data"
-    print(f"Using source data from local dir {data_dir}")
-    content = sorted(filter(lambda x: x.endswith(".csv"), os.listdir(data_dir)))
-    return pd.concat((pd.read_csv(f'{data_dir}/{f}') for f in content))
+def get_data_from_dir(dataset_id=None, local_data_dir=None):
+    print(f"Using source data from local dir {local_data_dir}")
+    content = sorted(filter(lambda x: x.endswith(".csv"), os.listdir(local_data_dir)))
+    return pd.concat((pd.read_csv(f'{local_data_dir}/{f}') for f in content))
 
-def prepare_data(model_name, dataset_id=None, local_data=False):
+def prepare_data(model_name, dataset_id=None, local_data=False,local_data_dir=None):
     X = None
     if (local_data):
-        X = get_data_from_dir(dataset_id)
+        X = get_data_from_dir(dataset_id, local_data_dir)
     else:
         X = get_data(dataset_id)
     
@@ -34,13 +33,12 @@ def prepare_data(model_name, dataset_id=None, local_data=False):
 
     return X, y
 
-def do_train(model_name, dataset_id=None, base_dir=None, local_data=False):
-    X, y = prepare_data(model_name, dataset_id, local_data)
+def do_train(model_name, dataset_id=None, base_dir=None, local_data=False, local_data_dir=None):
+    X, y = prepare_data(model_name, dataset_id, local_data, local_data_dir)
     AVAILABLE_MODELS[model_name]().train(X, y, base_dir)
 
-
-def do_eval(model_name, dataset_id=None, local_data=False):
-    X, y = prepare_data(model_name, dataset_id, local_data)
+def do_eval(model_name, dataset_id=None, local_data=False, local_data_dir=None):
+    X, y = prepare_data(model_name, dataset_id, local_data, local_data_dir)
     r2_score = AVAILABLE_MODELS[model_name]().eval(X, y)
     print(f'Model {model_name} evaluated, r2-score {r2_score}')
 
@@ -101,18 +99,19 @@ if __name__ == "__main__":
     
     args = parser.parse_args()
 
-    base_dir = os.environ.get('MNT_DIR', './')
+    base_dir = os.environ.get('MODEL_DIR', './')
+    local_data_dir = os.environ.get('LOCAL_DATA_DIR', './emission_data/')
 
     if args.subcommand == "train":
         if args.model in AVAILABLE_MODELS:
             if args.eval:
                 if (args.local_data):
-                    do_eval(args.model, local_data=True)
+                    do_eval(args.model, local_data=True, local_data_dir=local_data_dir)
                 else:
                     do_eval(args.model)
             else:
                 if (args.local_data):
-                    do_train(args.model, base_dir=base_dir, local_data=True)
+                    do_train(args.model, base_dir=base_dir, local_data=True, local_data_dir=local_data_dir)
                 else:
                     do_train(args.model, base_dir=base_dir)
         else:
