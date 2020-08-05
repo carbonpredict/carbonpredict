@@ -4,3 +4,4 @@ sklearn
 lightgbm
 bayesian-optimization
 flask
+flasgger

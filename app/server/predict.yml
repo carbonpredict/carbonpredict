@@ -1,0 +1,98 @@
+OpenAPI specification for prediction API method 
+---
+paths:
+  /predict:
+    post:
+      summary: Predict CO2e for product
+      requestBody:
+        description: Optional description in *Markdown*
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                brand:
+                  type: string
+                category-1:
+                  type: string
+                category-2:
+                  type: string
+                category-3:
+                  type: string
+                colour:
+                  type: string
+                fabric_type:
+                  type: string
+                ftp_acrylic:
+                  type: number
+                ftp_cotton:
+                  type: number
+                ftp_elastane:
+                  type: number
+                ftp_linen:
+                  type: number
+                ftp_other:
+                  type: number
+                ftp_polyamide:
+                  type: number
+                ftp_polyester:
+                  type: number
+                ftp_polypropylene:
+                  type: number
+                ftp_silk:
+                  type: number
+                ftp_viscose:
+                  type: number
+                ftp_wool:
+                  type: number
+                gender:
+                  type: string
+                label:
+                  type: string
+                made_in:
+                  type: string
+                season:
+                  type: string
+                size:
+                  type: string
+                unspsc_code:
+                  type: string
+                weight:
+                  type: number
+                ML-model:
+                  type: string
+              example:
+                brand: b119
+                category-1: kidswear
+                category-2: suit
+                category-3: tie
+                colour: blue gray
+                fabric_type: K
+                ftp_acrylic: 15.0
+                ftp_cotton: 0
+                ftp_elastane: 0
+                ftp_linen: 33.0
+                ftp_other: 7.0
+                ftp_polyamide: 0
+                ftp_polyester: 14.0
+                ftp_polypropylene: 11.0
+                ftp_silk: 15.0
+                ftp_viscose: 0
+                ftp_wool: 10.0
+                gender: Y
+                label:
+                made_in: CN
+                season: AYR
+                size: XS
+                unspsc_code:
+                weight: 0.1
+                ML-model: lgbm_default
+      responses:
+        '201':
+          description: Created
+          content:
+            text/plain:
+              schema:
+                type: number
+                example: 5.12 
