@@ -51,7 +51,7 @@ def do_prediction(model_name, csv_file, base_dir):
     return model.predict(X)
 
 def load_model(model_name):
-    base_dir = os.environ.get('MNT_DIR', './')
+    base_dir = os.environ.get('MODEL_DIR', './')
     model = AVAILABLE_MODELS[model_name]()
     model.load(base_dir)
     return model
