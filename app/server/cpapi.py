@@ -2,6 +2,7 @@
 from flask import Flask, jsonify, abort, make_response, request, url_for
 from werkzeug.utils import secure_filename
 from cli import do_train, do_prediction_with_params, load_model
+from flasgger import Swagger, swag_from
 import random
 import os
 
@@ -49,8 +50,18 @@ ALLOWED_EXTENSIONS = {'json'}
 
 app = Flask(__name__)
 
+app.config['SWAGGER'] = {
+    'title': 'Carbon predict API',
+    'url': '/ccaas/api/v0.1',
+    'version': "0.1",
+    'uiversion': 3
+}
+
+swagger = Swagger(app)
+
 @app.route('/ccaas/api/v0.1/predict', methods=['POST'])
-def predict():
+@swag_from('predict.yml')
+def predict():    
     if not request.json or not 'category-3' in request.json:
         abort(400)
     
@@ -79,7 +90,7 @@ def predict():
     "size": request.json["size"],
     "unspsc_code": request.json["unspsc_code"],
     "weight": request.json["weight"],
-    "ML-model": request.json["ML-model"],  # defaut ML model is xyz
+    "ML-model": request.json["ML-model"]
     }
 
     product["co2_total"] = None
@@ -95,22 +106,6 @@ def predict():
     print('CO2e prediction complete, returning result')
     print(CO2e)
     return CO2e, 201
-
-    """
-    # This is just here to give a random response until real responses work
-    co2e = random.randint(150,666)
-    ci = round(co2e/10)
-    mean = co2e - 2
-    median = co2e - 4
-    CO2E = {
-        'CO2e': co2e,
-        '95% confidence level': ci,
-        'mean': mean,
-        'median': median
-        }
-    
-    return CO2E, 201
-    """
 
 def run():
     flask_run_host = os.environ.get('FLASK_RUN_HOST', '0.0.0.0')
