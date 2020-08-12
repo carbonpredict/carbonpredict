@@ -50,6 +50,9 @@ def do_prediction(model_name, csv_file, base_dir):
 
     return model.predict(X)
 
+def get_models():
+    return list(AVAILABLE_MODELS.keys())
+
 def load_model(model_name):
     base_dir = os.environ.get('MODEL_DIR', './')
     model = AVAILABLE_MODELS[model_name]()
@@ -123,7 +126,7 @@ if __name__ == "__main__":
         else:
             print(f"Error: model {args.model} is not available")
     elif args.subcommand == "models":
-        print("Available models:", list(AVAILABLE_MODELS.keys()))
+        print("Available models:", get_models())
         sys.exit(0)
     elif args.subcommand == "run-server":
         print("Starting web server...")

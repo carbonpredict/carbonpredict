@@ -1,51 +1,17 @@
 #!flask/bin/python
 from flask import Flask, jsonify, abort, make_response, request, url_for
 from werkzeug.utils import secure_filename
-from cli import do_prediction_with_params, load_model
+from cli import do_eval, do_prediction_with_params, do_train, get_models, load_model
 from flasgger import Swagger, swag_from
 import os
 
 """
-This is an initial inplementtion of a REST based API and server for the CCaaS service.
-As input the following json format with example values is expected. 
-At least the "category-3" feature needs to have a value. Other 
-features are optional. Also the ML used in prediction can be selected.
-The default ML-model is "xyz".
-{
-    "brand": "b83",
-    "category-1": "womenswear",
-    "category-2": "footwear",
-    "category-3": "socks",
-    "colour": "bondi blue",
-    "fabric_type": "K",
-    "ftp_acrylic": "21.0",
-    "ftp_cotton": "",
-    "ftp_elastane": "",
-    "ftp_linen": "",
-    "ftp_other": "",
-    "ftp_polyamide": "43.0",
-    "ftp_polyester": "",
-    "ftp_polypropylene": "24.0",
-    "ftp_silk": "",
-    "ftp_viscose": "",
-    "ftp_wool": "11.0",
-    "gender": "W",
-    "label": "",
-    "made_in": "VN",
-    "season": "",
-    "size": "M",
-    "unspsc_code": "",
-    "weight": "0.029",
-    "ML-model": "", 
-}
+Flask server and REST based prediction API and admin API for the CCaaS service. 
 
-Example usage. 1. Run the server and the api. 2. Call it with curl using wsocks.json file with test input
-$ python cpapi.py
-$ curl -i -H "Content-Type: application/json" -X POST --data "@wsocks.json" http://localhost:5000/ccaas/api/v0.1/predict
+Example usage. 
+1. Start the server (from repository root directory `docker-compose run --service-ports carbon run-server`)
+2. Call prediction API with CURL using wsocks.json file with test input (from repo root directory `curl -i -H "Content-Type: application/json" -X POST --data "testdata/@wsocks.json" http://localhost:5000/ccaas/api/v0.1/predict`)
 """
-
-UPLOAD_FOLDER = './uploads'
-ALLOWED_EXTENSIONS = {'json'}
 
 app = Flask(__name__)
 
@@ -105,6 +71,26 @@ def predict():
     print('CO2e prediction complete, returning result')
     print(CO2e)
     return CO2e, 201
+
+@app.route('/ccaas/api/v0.1/train', methods=['POST'])
+#@swag_from('train.yml')
+def train_model():
+    """
+    Params: sourcedata version (or URL), model name to train
+    Returns (right away) training started. Later: webhook, training finished 
+    """
+    return 200
+
+@app.route('/ccaas/api/v0.1/models', methods=['GET'])
+#@swag_from('models.yml')
+def models():
+    """
+    No params
+    Return list of available model names
+    """
+    models = get_models()
+    print(f"Available models: {models}")
+    return jsonify(models), 200
 
 def run():
     flask_run_host = os.environ.get('FLASK_RUN_HOST', '0.0.0.0')
