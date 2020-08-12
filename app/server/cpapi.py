@@ -49,17 +49,21 @@ UPLOAD_FOLDER = './uploads'
 ALLOWED_EXTENSIONS = {'json'}
 
 app = Flask(__name__)
+
+
 app.config['SWAGGER'] = {
     'title': 'Carbon predict API',
     'url': '/ccaas/api/v0.1',
-    'version': "0.9.0",
+    'version': "0.1",
     'uiversion': 3
 }
+
+
 swagger = Swagger(app)
 
 @app.route('/ccaas/api/v0.1/predict', methods=['POST'])
 @swag_from('predict.yml')
-def predict():
+def predict():    
     if not request.json or not 'category-3' in request.json:
         abort(400)
     
