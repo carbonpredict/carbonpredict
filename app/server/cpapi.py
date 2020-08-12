@@ -1,7 +1,7 @@
 #!flask/bin/python
 from flask import Flask, jsonify, abort, make_response, request, url_for
 from werkzeug.utils import secure_filename
-from cli import do_train, do_prediction_with_params, load_model
+from cli import do_prediction_with_params, load_model
 from flasgger import Swagger, swag_from
 import random
 import os
