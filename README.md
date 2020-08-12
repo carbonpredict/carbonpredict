@@ -63,7 +63,17 @@ See *[prediction API definition](predict_api.md)*.
 Endpoint: */ccaas/api/v0.1/models* (GET). Returns a JSON array of model names available. Example response body: ["dummy", "k_nearest_neighbors", "lgbm_default"].
 
 ### Train API
-Train API will be used for training selected models on selected source data.
+Endpoint: */ccaas/api/v0.1/train* (POST). HTTP body is type application/json and contains the training data and machine learning model definition in JSON format.
+
+#### Example message body
+```
+{
+    "data-format": "tgz",
+    "ML-model": "lgbm_default",
+    "source-data-directory": "datasets/textile-v1.0.0",
+    "source-data-repo": "https://github.com/Compensate-Operations/emission-sample-data.git",
+}
+```
 
 ## Possible future features
 - Extend software to support other product categories

@@ -1,0 +1,38 @@
+Carbon prediction model training endpoint
+Described using OpenAPI Specification ver. 2 (formerly known as Swagger)
+---
+summary: Train machine learning models using defined source data
+consumes:
+    - application/json
+parameters:
+  - in: body 
+    name: Training definition
+    description: Definition of source data and model. All files of given format in given directory will be processed.
+    schema:
+      type: object
+      required:
+        - data-format
+        - ML-model
+        - source-data-directory
+        - source-data-repo
+      properties:
+        data-format:
+          type: string
+          description: Source data format in repo, csv or tgz supported
+        ML-model:
+          type: string
+          description: Name of machine learning model to train
+        source-data-directory:
+          type: string
+          description: Source data directory within repo
+        source-data-repo:
+          type: string
+          description: Source data git repository URL (using https protocol)
+      example:
+        data-format: tgz
+        ML-model: lgbm_default
+        source-data-directory: datasets/textile-v1.0.0
+        source-data-repo: https://github.com/Compensate-Operations/emission-sample-data.git
+responses:
+  '201':
+    description: Created

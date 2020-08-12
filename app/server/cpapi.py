@@ -27,7 +27,10 @@ swagger = Swagger(app)
 @app.route('/ccaas/api/v0.1/predict', methods=['POST'])
 @swag_from('predict.yml')
 def predict():    
-    if not request.json or not 'category-3' in request.json:
+    """
+    Predict CO2e for a product with given features
+    """
+    if (not request.json):
         abort(400)
     
     product = {
@@ -58,9 +61,9 @@ def predict():
     "ML-model": request.json["ML-model"]
     }
 
-    product["co2_total"] = None
-    ml_model = product.pop("ML-model", None)
-    if (ml_model == None or ml_model == ""):
+    product['co2_total'] = None
+    ml_model = product.pop('ML-model', None)
+    if (ml_model == None or ml_model == ''):
         print('Loading default model: LGBM')
         ml_model = 'lgbm_default'
     else:
@@ -73,22 +76,37 @@ def predict():
     return CO2e, 201
 
 @app.route('/ccaas/api/v0.1/train', methods=['POST'])
-#@swag_from('train.yml')
+@swag_from('train.yml')
 def train_model():
     """
-    Params: sourcedata version (or URL), model name to train
-    Returns (right away) training started. Later: webhook, training finished 
+    Train a model with given source data
     """
-    return 200
+    if (not request.json 
+        or not 'data-format' in request.json
+        or not 'ML-model' in request.json
+        or not 'source-data-directory' in request.json
+        or not 'source-data-repo' in request.json):
+        abort(400)
+
+    data_format = request.json['data-format']
+    ML_model = request.json['ML-model']
+    source_data_directory = request.json['source-data-directory']
+    source_data_repo = request.json['source-data-repo'],
+    
+    do_train(model_name=ML_model, 
+        repo_url=source_data_repo, 
+        repo_data_directory=source_data_directory, 
+        data_format=data_format)
+    return 201
 
 @app.route('/ccaas/api/v0.1/models', methods=['GET'])
 @swag_from('models.yml')
 def models():
     """
-    List available models.
+    List available models
     """
     models = get_models()
-    print(f"Available models: {models}")
+    print(f'Available models: {models}')
     return jsonify(models), 200
 
 def run():

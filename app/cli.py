@@ -6,25 +6,36 @@ from models import AVAILABLE_MODELS
 from models import AVAILABLE_MODELS
 from server import cpapi
 
-def get_data(dataset_id=None):
+def get_data(repo_url, repo_data_directory, data_format="tgz", dataset_id=None):
     clone_dir = "/tmp/emission_data"
-    os.system(f'git clone https://github.com/Compensate-Operations/emission-sample-data.git {clone_dir}/')
-    os.system(f'for i in {clone_dir}/datasets/textile-v1.0.0/*.tgz; do tar -zxvf "$i" -C {clone_dir}/ ;done')
-    os.system(f'rm {clone_dir}/._textile-v1.0.0-5.csv')
+    os.system(f'git clone {repo_url} {clone_dir}/')
+    
+    if (data_format=="tgz"):
+        os.system(f'for i in {clone_dir}/{repo_data_directory}/*.tgz; do tar -zxvf "$i" -C {clone_dir}/ ;done')
+    elif (data_format=="csv"):
+        os.system(f'for i in {clone_dir}/{repo_data_directory}/*.csv; do cp "$i" {clone_dir}/ ;done')
+    else:
+        raise ValueError('Source data format not recognized. Only tgz and csv supported.')
+    
+    # Remove known garbage file in textile source data v. 1.0.0
+    garbage_file = f"{clone_dir}/._textile-v1.0.0-5.csv"
+    if (os.path.isfile(garbage_file)):
+        os.system(f'rm {garbage_file}')
+    
     content = sorted(filter(lambda x: x.endswith(".csv"), os.listdir(clone_dir)))
     return pd.concat((pd.read_csv(f'{clone_dir}/{f}') for f in content))
 
-def get_data_from_dir(dataset_id=None, local_data_dir=None):
+def get_data_from_dir(local_data_dir=None, dataset_id=None):
     print(f"Using source data from local dir {local_data_dir}")
     content = sorted(filter(lambda x: x.endswith(".csv"), os.listdir(local_data_dir)))
     return pd.concat((pd.read_csv(f'{local_data_dir}/{f}') for f in content))
 
-def prepare_data(model_name, dataset_id=None, local_data=False,local_data_dir=None):
+def prepare_data(model_name, local_data=False, local_data_dir=None, repo_url=None, repo_data_directory=None, data_format="tgz", dataset_id=None):
     X = None
     if (local_data):
-        X = get_data_from_dir(dataset_id, local_data_dir)
+        X = get_data_from_dir(local_data_dir,dataset_id)
     else:
-        X = get_data(dataset_id)
+        X = get_data(repo_url, repo_data_directory, data_format, dataset_id)
     
     X = X[~X["co2_total"].isna()]
 
@@ -33,12 +44,20 @@ def prepare_data(model_name, dataset_id=None, local_data=False,local_data_dir=No
 
     return X, y
 
-def do_train(model_name, dataset_id=None, base_dir=None, local_data=False, local_data_dir=None):
-    X, y = prepare_data(model_name, dataset_id, local_data, local_data_dir)
+def do_train(model_name, base_dir=None, local_data=False, local_data_dir=None,
+    repo_url='https://github.com/Compensate-Operations/emission-sample-data.git', 
+    repo_data_directory='datasets/textile-v1.0.0', 
+    data_format='tgz',
+    dataset_id=None):
+    X, y = prepare_data(model_name, local_data, local_data_dir, repo_url, repo_data_directory, data_format, dataset_id)
     AVAILABLE_MODELS[model_name]().train(X, y, base_dir)
 
-def do_eval(model_name, dataset_id=None, local_data=False, local_data_dir=None):
-    X, y = prepare_data(model_name, dataset_id, local_data, local_data_dir)
+def do_eval(model_name, local_data=False, local_data_dir=None,
+    repo_url='https://github.com/Compensate-Operations/emission-sample-data.git', 
+    repo_data_directory='datasets/textile-v1.0.0', 
+    data_format='tgz', 
+    dataset_id=None):
+    X, y = prepare_data(model_name, local_data, local_data_dir, repo_url, repo_data_directory, data_format, dataset_id)
     r2_score = AVAILABLE_MODELS[model_name]().eval(X, y)
     print(f'Model {model_name} evaluated, r2-score {r2_score}')
 

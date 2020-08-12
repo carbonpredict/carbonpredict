@@ -5,9 +5,13 @@ Documented also using OpenAPI (version 2), UI available at http://*hostname*:500
 ## Endpoint
 */ccaas/api/v0.1/predict* (POST).
 
-HTTP body is type application/json and contain the input features in JSON format (see below).
+HTTP body is type application/json and contains the input features in JSON format (see below).
+
+## Returns
+HTTP 201 with estimated grams of CO2e for product as number in message body.
 
 ## Example message body
+```
 {
   "ML-model": "lgbm_default",
   "brand": "b119",
@@ -35,17 +39,19 @@ HTTP body is type application/json and contain the input features in JSON format
   "unspsc_code": {},
   "weight": 0.1
 }
+```
 
 ## Input features
 
 | Field | Type | Description
 | --- | --- | --- |
+| ML-model | string | Machine learning model name to use for prediction (e.g. lgbm_default)
 | brand | string | Brand id hash (e.g. "b25", "b124")
 | category-1 | string | Product level 1 category (e.g. "clothing", "womenswear", "menswear", "kidswear" or "home")
 | category-2 | string | Product level 2 category (e.g. "outerwear", "thermals", "swimwear")
 | category-3 | string | Product level 3 category (e.g. "knitwear", "coats", "jacket", "skirts", "trousers")
 | colour | string | Product colour
-| fabric_type | number | Product fabric type (e.g. "knit", "woven")
+| fabric_type | number | Product fabric type, K = "knit" or W = "woven")
 | ftp_acrylic | number | Fibre type percentage of Acrylic
 | ftp_cotton | number | Fibre type percentage of Cotton
 | ftp_elastane | number | Fibre type percentage of Elastene
@@ -63,7 +69,7 @@ HTTP body is type application/json and contain the input features in JSON format
 | season | string | Season code, see season mappings below (e.g. "MID", "SUM")
 | size | string | Product size (e.g. "XS", "S", "M", "L", "XL" etc)
 | unspsc_code | string | Product or service UNSPSC code, NOT IN USE
-| weight | number | Products weight in kilograms
+| weight | number | Product weight in kilograms
 
 ### Gender mappings
 
@@ -82,11 +88,6 @@ HTTP body is type application/json and contain the input features in JSON format
 | Gender | Code
 | --- | --- |
 | All-year round | AYR
-| winter | WIN"
-| midterm | MID"
-| summer | SUM"
-
-## Output
-| Field | Description
-| --- | --- |
-| co2_total | Amount of kgCO2e / product.
+| winter | WIN
+| midterm | MID
+| summer | SUM
