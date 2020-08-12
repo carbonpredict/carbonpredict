@@ -4,13 +4,15 @@ from werkzeug.utils import secure_filename
 from cli import do_eval, do_prediction_with_params, do_train, get_models, load_model
 from flasgger import Swagger, swag_from
 import os
+import time
+
 
 """
 Flask server and REST based prediction API and admin API for the CCaaS service. 
 
 Example usage. 
 1. Start the server (from repository root directory `docker-compose run --service-ports carbon run-server`)
-2. Call prediction API with CURL using wsocks.json file with test input (from repo root directory `curl -i -H "Content-Type: application/json" -X POST --data "testdata/@wsocks.json" http://localhost:5000/ccaas/api/v0.1/predict`)
+2. Call prediction API with CURL using wsocks.json file with test input (from repo root directory `curl -i -H 'Content-Type: application/json' -X POST --data 'testdata/@wsocks.json' http://localhost:5000/ccaas/api/v0.1/predict`)
 """
 
 app = Flask(__name__)
@@ -18,7 +20,7 @@ app = Flask(__name__)
 app.config['SWAGGER'] = {
     'title': 'Carbon predict API',
     'url': '/ccaas/api/v0.1',
-    'version': "0.1",
+    'version': '0.1',
     'uiversion': 3
 }
 
@@ -34,31 +36,31 @@ def predict():
         abort(400)
     
     product = {
-    "brand": request.json["brand"],
-    "category-1": request.json["category-1"],
-    "category-2": request.json["category-2"],
-    "category-3": request.json["category-3"],
-    "colour": request.json["colour"],
-    "fabric_type": request.json["fabric_type"],
-    "ftp_acrylic": request.json["ftp_acrylic"],
-    "ftp_cotton": request.json["ftp_cotton"],
-    "ftp_elastane": request.json["ftp_elastane"],
-    "ftp_linen": request.json["ftp_linen"],
-    "ftp_other": request.json["ftp_other"],
-    "ftp_polyamide": request.json["ftp_polyamide"],
-    "ftp_polyester": request.json["ftp_polyester"],
-    "ftp_polypropylene": request.json["ftp_polypropylene"],
-    "ftp_silk": request.json["ftp_silk"],
-    "ftp_viscose": request.json["ftp_viscose"],
-    "ftp_wool": request.json["ftp_wool"],
-    "gender": request.json["gender"],
-    "label": request.json["label"],
-    "made_in": request.json["made_in"],
-    "season": request.json["season"],
-    "size": request.json["size"],
-    "unspsc_code": request.json["unspsc_code"],
-    "weight": request.json["weight"],
-    "ML-model": request.json["ML-model"]
+    'brand': request.json['brand'],
+    'category-1': request.json['category-1'],
+    'category-2': request.json['category-2'],
+    'category-3': request.json['category-3'],
+    'colour': request.json['colour'],
+    'fabric_type': request.json['fabric_type'],
+    'ftp_acrylic': request.json['ftp_acrylic'],
+    'ftp_cotton': request.json['ftp_cotton'],
+    'ftp_elastane': request.json['ftp_elastane'],
+    'ftp_linen': request.json['ftp_linen'],
+    'ftp_other': request.json['ftp_other'],
+    'ftp_polyamide': request.json['ftp_polyamide'],
+    'ftp_polyester': request.json['ftp_polyester'],
+    'ftp_polypropylene': request.json['ftp_polypropylene'],
+    'ftp_silk': request.json['ftp_silk'],
+    'ftp_viscose': request.json['ftp_viscose'],
+    'ftp_wool': request.json['ftp_wool'],
+    'gender': request.json['gender'],
+    'label': request.json['label'],
+    'made_in': request.json['made_in'],
+    'season': request.json['season'],
+    'size': request.json['size'],
+    'unspsc_code': request.json['unspsc_code'],
+    'weight': request.json['weight'],
+    'ML-model': request.json['ML-model']
     }
 
     product['co2_total'] = None
@@ -91,13 +93,20 @@ def train_model():
     data_format = request.json['data-format']
     ML_model = request.json['ML-model']
     source_data_directory = request.json['source-data-directory']
-    source_data_repo = request.json['source-data-repo'],
+    source_data_repo = request.json['source-data-repo']
     
+    start = time.time()
+
     do_train(model_name=ML_model, 
         repo_url=source_data_repo, 
         repo_data_directory=source_data_directory, 
         data_format=data_format)
-    return 201
+    
+    end = time.time()
+
+    runningtime = (end - start)
+
+    return f'Model {ML_model} trained using source data in directory {source_data_directory}, running time {runningtime} seconds', 201
 
 @app.route('/ccaas/api/v0.1/models', methods=['GET'])
 @swag_from('models.yml')

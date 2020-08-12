@@ -63,7 +63,7 @@ See *[prediction API definition](predict_api.md)*.
 Endpoint: */ccaas/api/v0.1/models* (GET). Returns a JSON array of model names available. Example response body: ["dummy", "k_nearest_neighbors", "lgbm_default"].
 
 ### Train API
-Endpoint: */ccaas/api/v0.1/train* (POST). HTTP body is type application/json and contains the training data and machine learning model definition in JSON format.
+Endpoint: */ccaas/api/v0.1/train* (POST). HTTP body is type application/json and contains the training data and machine learning model definition in JSON format. NOTE: Training is a slow operation and might take e.g. 5-30 minutes depending on the model, source data size and host machine resources.
 
 #### Example message body
 ```

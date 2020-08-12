@@ -7,7 +7,7 @@ consumes:
 parameters:
   - in: body 
     name: Training definition
-    description: Definition of source data and model. All files of given format in given directory will be processed.
+    description: "Definition of source data and model. All files of given format in given directory will be processed. NOTE: Training is a slow operation and might take e.g. 5-30 minutes depending on the model, source data size and host machine resources."
     schema:
       type: object
       required:

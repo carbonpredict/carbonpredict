@@ -6,41 +6,44 @@ from models import AVAILABLE_MODELS
 from models import AVAILABLE_MODELS
 from server import cpapi
 
-def get_data(repo_url, repo_data_directory, data_format="tgz", dataset_id=None):
-    clone_dir = "/tmp/emission_data"
+def get_data(repo_url, repo_data_directory, data_format='tgz', dataset_id=None):
+    clone_dir = '/tmp/emission_data'
+    print(f'Cloning repo {repo_url} to directory {clone_dir}...')
     os.system(f'git clone {repo_url} {clone_dir}/')
     
-    if (data_format=="tgz"):
+    if (data_format=='tgz'):
+        print(f'Unzipping with tar...')
         os.system(f'for i in {clone_dir}/{repo_data_directory}/*.tgz; do tar -zxvf "$i" -C {clone_dir}/ ;done')
-    elif (data_format=="csv"):
+    elif (data_format=='csv'):
         os.system(f'for i in {clone_dir}/{repo_data_directory}/*.csv; do cp "$i" {clone_dir}/ ;done')
     else:
         raise ValueError('Source data format not recognized. Only tgz and csv supported.')
     
     # Remove known garbage file in textile source data v. 1.0.0
-    garbage_file = f"{clone_dir}/._textile-v1.0.0-5.csv"
+    garbage_file = f'{clone_dir}/._textile-v1.0.0-5.csv'
     if (os.path.isfile(garbage_file)):
+        print(f'Removing garbage file {garbage_file}')
         os.system(f'rm {garbage_file}')
     
-    content = sorted(filter(lambda x: x.endswith(".csv"), os.listdir(clone_dir)))
+    content = sorted(filter(lambda x: x.endswith('.csv'), os.listdir(clone_dir)))
     return pd.concat((pd.read_csv(f'{clone_dir}/{f}') for f in content))
 
 def get_data_from_dir(local_data_dir=None, dataset_id=None):
-    print(f"Using source data from local dir {local_data_dir}")
-    content = sorted(filter(lambda x: x.endswith(".csv"), os.listdir(local_data_dir)))
+    print(f'Using source data from local dir {local_data_dir}')
+    content = sorted(filter(lambda x: x.endswith('.csv'), os.listdir(local_data_dir)))
     return pd.concat((pd.read_csv(f'{local_data_dir}/{f}') for f in content))
 
-def prepare_data(model_name, local_data=False, local_data_dir=None, repo_url=None, repo_data_directory=None, data_format="tgz", dataset_id=None):
+def prepare_data(model_name, local_data=False, local_data_dir=None, repo_url=None, repo_data_directory=None, data_format='tgz', dataset_id=None):
     X = None
     if (local_data):
         X = get_data_from_dir(local_data_dir,dataset_id)
     else:
         X = get_data(repo_url, repo_data_directory, data_format, dataset_id)
     
-    X = X[~X["co2_total"].isna()]
+    X = X[~X['co2_total'].isna()]
 
-    y = X["co2_total"].copy()
-    X = X.drop("co2_total", axis=1)
+    y = X['co2_total'].copy()
+    X = X.drop('co2_total', axis=1)
 
     return X, y
 
@@ -49,7 +52,12 @@ def do_train(model_name, base_dir=None, local_data=False, local_data_dir=None,
     repo_data_directory='datasets/textile-v1.0.0', 
     data_format='tgz',
     dataset_id=None):
+
+    if (base_dir == None):
+        base_dir = os.environ.get('MODEL_DIR', './')
+
     X, y = prepare_data(model_name, local_data, local_data_dir, repo_url, repo_data_directory, data_format, dataset_id)
+    print('Data preparation complete. Starting training of model.')
     AVAILABLE_MODELS[model_name]().train(X, y, base_dir)
 
 def do_eval(model_name, local_data=False, local_data_dir=None,
@@ -57,9 +65,13 @@ def do_eval(model_name, local_data=False, local_data_dir=None,
     repo_data_directory='datasets/textile-v1.0.0', 
     data_format='tgz', 
     dataset_id=None):
+
     X, y = prepare_data(model_name, local_data, local_data_dir, repo_url, repo_data_directory, data_format, dataset_id)
+    print('Data preparation complete. Starting training and evaluation of model.')
     r2_score = AVAILABLE_MODELS[model_name]().eval(X, y)
     print(f'Model {model_name} evaluated, r2-score {r2_score}')
+
+    return r2_score
 
 def do_prediction(model_name, csv_file, base_dir):
     model = AVAILABLE_MODELS[model_name]()
@@ -95,19 +107,19 @@ def do_prediction_with_params(model, params):
     prediction = str(prediction[0])
     return prediction
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Carbon Models')
     subparsers = parser.add_subparsers(title='subcommands', 
                                     description='valid subcommands', 
                                     help='Run subcommand --help for details',
-                                    dest="subcommand")
+                                    dest='subcommand')
 
     models_parser = subparsers.add_parser('models')
     
     train_parser = subparsers.add_parser('train')
     train_parser.add_argument('model', type=str, help='Select model')
-    train_parser.add_argument('--eval', action="store_true", help='Evaluate model')
-    train_parser.add_argument('--local_data', action="store_true", help='Use csv source data in directory /tmp/emission_data')
+    train_parser.add_argument('--eval', action='store_true', help='Evaluate model')
+    train_parser.add_argument('--local_data', action='store_true', help='Use csv source data in directory /tmp/emission_data')
     
     predict_parser = subparsers.add_parser('predict')
     predict_parser.add_argument('model', type=str, help='Select model')
@@ -124,29 +136,29 @@ if __name__ == "__main__":
     base_dir = os.environ.get('MODEL_DIR', './')
     local_data_dir = os.environ.get('LOCAL_DATA_DIR', './emission_data/')
 
-    if args.subcommand == "train":
+    if args.subcommand == 'train':
         if args.model in AVAILABLE_MODELS:
             if args.eval:
                 if (args.local_data):
-                    do_eval(args.model, local_data=True, local_data_dir=local_data_dir)
+                    _ = do_eval(args.model, local_data=True, local_data_dir=local_data_dir)
                 else:
-                    do_eval(args.model)
+                    _ = do_eval(args.model)
             else:
                 if (args.local_data):
                     do_train(args.model, base_dir=base_dir, local_data=True, local_data_dir=local_data_dir)
                 else:
                     do_train(args.model, base_dir=base_dir)
         else:
-            print(f"Error: model {args.model} is not available")
-    elif args.subcommand == "predict":
+            print(f'Error: model {args.model} is not available')
+    elif args.subcommand == 'predict':
         if args.model in AVAILABLE_MODELS:
             predictions = do_prediction(args.model, args.csv_file, base_dir)
             print(predictions)
         else:
-            print(f"Error: model {args.model} is not available")
-    elif args.subcommand == "models":
-        print("Available models:", get_models())
+            print(f'Error: model {args.model} is not available')
+    elif args.subcommand == 'models':
+        print('Available models:', get_models())
         sys.exit(0)
-    elif args.subcommand == "run-server":
-        print("Starting web server...")
+    elif args.subcommand == 'run-server':
+        print('Starting web server...')
         cpapi.run()
