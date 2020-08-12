@@ -40,7 +40,7 @@ brand,category-1,category-2,category-3,co2_total,colour,fabric_type,ftp_acrylic,
 ### Run server
 To run the demo server, which offers an HTTP endpoint for calling the predict command, run `docker-compose run --service-ports carbon run-server`. 
 
-After the server is started, you can test the API using the **OpenAPI UI** (a.k.a. Swagger UI) by going to http://localhost:5000/apidocs/.
+After the server is started, you can test the API using the **OpenAPI UI** (a.k.a. Swagger UI) by going to http://*hostname*:5000/apidocs/.
 
 Alternatively, you can use CURL directly to send the product parameters in JSON format in an HTTP POST message. Example using curl (to be run inside directory */testdata*) using example data in file */testdata/wsocks.json*: `curl -i -H "Content-Type: application/json" -X POST --data "@wsocks.json" http://localhost:5000/ccaas/api/v0.1/predict`   
 
@@ -54,11 +54,26 @@ Alternatively, you can use CURL directly to send the product parameters in JSON 
 The used source data is published in the [emission-sample-data repository](https://github.com/Compensate-Operations/emission-sample-data) by [Compensate](https://compensate.com/).
 
 ## APIs
+All APIs documented also using OpenAPI (version 2), UI available at http://*hostname*:5000/apidocs/.
+
 ### Prediction API
 See *[prediction API definition](predict_api.md)*.
 
-### Admin API
-To be defined. Admin API will be used for training selected models on selected source data.
+### Models API
+Endpoint: */ccaas/api/v0.1/models* (GET). Returns a JSON array of model names available. Example response body: ["dummy", "k_nearest_neighbors", "lgbm_default"].
+
+### Train API
+Endpoint: */ccaas/api/v0.1/train* (POST). HTTP body is type application/json and contains the training data and machine learning model definition in JSON format. NOTE: Training is a slow operation and might take e.g. 5-30 minutes depending on the model, source data size and host machine resources.
+
+#### Example message body
+```
+{
+    "data-format": "tgz",
+    "ML-model": "lgbm_default",
+    "source-data-directory": "datasets/textile-v1.0.0",
+    "source-data-repo": "https://github.com/Compensate-Operations/emission-sample-data.git",
+}
+```
 
 ## Possible future features
 - Extend software to support other product categories

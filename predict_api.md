@@ -1,33 +1,75 @@
 # Prediction API definition
 
+Documented also using OpenAPI (version 2), UI available at http://*hostname*:5000/apidocs/.
+
+## Endpoint
+*/ccaas/api/v0.1/predict* (POST).
+
+HTTP body is type application/json and contains the input features in JSON format (see below).
+
+## Returns
+HTTP 201 with estimated grams of CO2e for product as number in message body.
+
+## Example message body
+```
+{
+  "ML-model": "lgbm_default",
+  "brand": "b119",
+  "category-1": "kidswear",
+  "category-2": "suit",
+  "category-3": "tie",
+  "colour": "blue gray",
+  "fabric_type": "K",
+  "ftp_acrylic": 15,
+  "ftp_cotton": 0,
+  "ftp_elastane": 0,
+  "ftp_linen": 33,
+  "ftp_other": 7,
+  "ftp_polyamide": 0,
+  "ftp_polyester": 14,
+  "ftp_polypropylene": 11,
+  "ftp_silk": 15,
+  "ftp_viscose": 0,
+  "ftp_wool": 10,
+  "gender": "Y",
+  "label": {},
+  "made_in": "CN",
+  "season": "AYR",
+  "size": "XS",
+  "unspsc_code": {},
+  "weight": 0.1
+}
+```
+
 ## Input features
 
-| Field | Description
-| --- | --- |
-| brand | Brand id hash (e.g. "b25", "b124")
-| category-1 | Product level 1 category (e.g. "clothing", "womenswear", "menswear", "kidswear" or "home")
-| category-2 | Product level 2 category (e.g. "outerwear", "thermals", "swimwear")
-| category-3 | Product level 3 category (e.g. "knitwear", "coats", "jacket", "skirts", "trousers")
-| colour | Product colour
-| fabric_type | Product fabric type (e.g. "knit", "woven")
-| ftp_acrylic | Fibre type percentage of Acrylic
-| ftp_cotton | Fibre type percentage of Cotton
-| ftp_elastane | Fibre type percentage of Elastene
-| ftp_linen | Fibre type percentage of Linen
-| ftp_other | Fibre type percentage of other materials
-| ftp_polyamide | Fibre type percentage of Polyamide
-| ftp_polyester | Fibre type percentage of Polyester
-| ftp_polypropylene | Fibre type percentage of Polypropylene
-| ftp_silk | Fibre type percentage of Silk
-| ftp_viscose | Fibre type percentage of Viscose
-| ftp_wool | Fibre type percentage of Wool
-| gender | Gender code, see gender mappings below
-| label | Product label if we have one
-| made_in | Made in country, see ISO 3166-1 alpha-2 (e.g. "FI", "GR")
-| season | Season code, see season mappigs below (e.g. "MID", "SUM")
-| size | Product size (e.g. "XS", "S", "M", "L", "XL" etc)
-| unspsc_code | Product or service UNSPSC code, if known
-| weight | Products weight in kilograms
+| Field | Type | Description
+| --- | --- | --- |
+| ML-model | string | Machine learning model name to use for prediction (e.g. lgbm_default)
+| brand | string | Brand id hash (e.g. "b25", "b124")
+| category-1 | string | Product level 1 category (e.g. "clothing", "womenswear", "menswear", "kidswear" or "home")
+| category-2 | string | Product level 2 category (e.g. "outerwear", "thermals", "swimwear")
+| category-3 | string | Product level 3 category (e.g. "knitwear", "coats", "jacket", "skirts", "trousers")
+| colour | string | Product colour
+| fabric_type | number | Product fabric type, K = "knit" or W = "woven")
+| ftp_acrylic | number | Fibre type percentage of Acrylic
+| ftp_cotton | number | Fibre type percentage of Cotton
+| ftp_elastane | number | Fibre type percentage of Elastene
+| ftp_linen | number | Fibre type percentage of Linen
+| ftp_other | number | Fibre type percentage of other materials
+| ftp_polyamide | number | Fibre type percentage of Polyamide
+| ftp_polyester | number | Fibre type percentage of Polyester
+| ftp_polypropylene | number | Fibre type percentage of Polypropylene
+| ftp_silk | number | Fibre type percentage of Silk
+| ftp_viscose | number | Fibre type percentage of Viscose
+| ftp_wool | number | Fibre type percentage of Wool
+| gender | string | Gender code, see gender mappings below
+| label | string | Product label, NOT IN USE
+| made_in | string | Made in country, see ISO 3166-1 alpha-2 (e.g. "FI", "GR")
+| season | string | Season code, see season mappings below (e.g. "MID", "SUM")
+| size | string | Product size (e.g. "XS", "S", "M", "L", "XL" etc)
+| unspsc_code | string | Product or service UNSPSC code, NOT IN USE
+| weight | number | Product weight in kilograms
 
 ### Gender mappings
 
@@ -45,12 +87,7 @@
 
 | Gender | Code
 | --- | --- |
-|  All-year round | AYR
-| winter | WIN"
-| midterm | MID"
-| summer | SUM"
-
-## Output
-| Field | Description
-| --- | --- |
-| co2_total | Amount of kgCO2e / product.
+| All-year round | AYR
+| winter | WIN
+| midterm | MID
+| summer | SUM
