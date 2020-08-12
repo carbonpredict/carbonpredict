@@ -82,11 +82,10 @@ def train_model():
     return 200
 
 @app.route('/ccaas/api/v0.1/models', methods=['GET'])
-#@swag_from('models.yml')
+@swag_from('models.yml')
 def models():
     """
-    No params
-    Return list of available model names
+    List available models.
     """
     models = get_models()
     print(f"Available models: {models}")
