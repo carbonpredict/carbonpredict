@@ -1,16 +1,18 @@
 from .. import CarbonModelBase
 import lightgbm as lgb
 import numpy as np
+import pandas as pd
 from sklearn.model_selection import KFold
 from sklearn.metrics import mean_squared_error, r2_score
 from tqdm import tqdm
+from lightgbm import LGBMRegressor
 
 class LGBMDefault(CarbonModelBase):
 
     def __init__(self):
         self.models = []
-        self.params = {'bagging_fraction': 1.0,
-                'bagging_freq': 1,
+        self.params = {'bagging_fraction': 0.4,
+                'bagging_freq': 10,
                 'boosting_type': 'gbdt',
                 'colsample_bytree': 0.4,
                 'lambda_l1': 0.0,
@@ -35,8 +37,7 @@ class LGBMDefault(CarbonModelBase):
         X = X.drop("weight", axis=1)
 
         return X
-
-
+    
     def __train(self, X, y):
         print("Preprocessing data...")
         X = self.__preprocess(X)
@@ -92,7 +93,7 @@ class LGBMDefault(CarbonModelBase):
         for idx, model in enumerate(tqdm(models, total = self.n_splits, desc="Save")):
             model.save_model(f"{base_dir}/{self.__get_filename(idx)}", 
                             num_iteration=model.best_iteration)
-        
+
 
     def eval(self, X, y):
         _, s_r2 = self.__train(X, y)
@@ -107,17 +108,20 @@ class LGBMDefault(CarbonModelBase):
 
 
 
-from lightgbm import LGBMRegressor
 
 class LGBMQuantileRegression(LGBMDefault):
     def __init__(self):
         super().__init__()
 
+        self.qreg_low = None
+        self.qreg_mid = None
+        self.qreg_high = None
+
     
     def __train_qreg(self, X, y):
         self.params["objective"] = "quantile"
 
-        quantile_alphas = [0.1, 0.9]
+        quantile_alphas = [0.05, 0.5, 0.95]
 
         lgb_quantile_alphas = []
         for quantile_alpha in tqdm(quantile_alphas, desc="Training quantiles"):
@@ -133,22 +137,30 @@ class LGBMQuantileRegression(LGBMDefault):
 
 
     def train(self, X, y, base_dir=None):
-        super().train(X, y, base_dir)
+        X = self._LGBMDefault__preprocess(X)
         
-        qreg_low, qreg_high = self.__train_qreg(X, y)
+        qreg_low, qreg_mid, qreg_high = self.__train_qreg(X, y)
 
         qreg_low.booster_.save_model(f"{base_dir}/{self.__get_qreg_filename('low')}")
+        qreg_mid.booster_.save_model(f"{base_dir}/{self.__get_qreg_filename('mid')}")
         qreg_high.booster_.save_model(f"{base_dir}/{self.__get_qreg_filename('high')}")
 
 
-    def eval(self, X, y):
-        _, s_r2 = self.__train(X, y)
+    def load(self, base_dir):
+        super().load(base_dir)
 
-        return s_r2
+        self.qreg_low = lgb.Booster(model_file=f"{base_dir}/{self.__get_qreg_filename('low')}")
+        self.qreg_mid = lgb.Booster(model_file=f"{base_dir}/{self.__get_qreg_filename('mid')}")
+        self.qreg_high = lgb.Booster(model_file=f"{base_dir}/{self.__get_qreg_filename('high')}")
 
 
     def predict(self, X):
-        X = self.__preprocess(X)
+        X = self._LGBMDefault__preprocess(X)
         X = X.drop("co2_total", axis=1)
-        return list(np.mean([model.predict(X) for model in self.models], axis=0))
+
+        low_pred = self.qreg_low.predict(X)
+        mid_pred = self.qreg_mid.predict(X)
+        high_pred = self.qreg_high.predict(X)
+
+        return pd.DataFrame({'prediction': mid_pred, 'lower_ci': low_pred, 'higher_ci': high_pred})
 

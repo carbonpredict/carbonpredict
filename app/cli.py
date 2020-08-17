@@ -156,6 +156,7 @@ if __name__ == '__main__':
             print(f'Error: model {args.model} is not available')
     elif args.subcommand == 'predict':
         if args.model in AVAILABLE_MODELS:
+            pd.set_option('display.max_rows', None)
             predictions = do_prediction(args.model, args.csv_file, base_dir)
             print(predictions)
         else:
