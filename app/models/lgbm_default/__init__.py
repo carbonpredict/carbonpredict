@@ -1,3 +1,3 @@
 
 
-from .impl import LGBMDefault
+from .impl import LGBMDefault, LGBMQuantileRegression

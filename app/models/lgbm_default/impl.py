@@ -40,7 +40,7 @@ class LGBMDefault(CarbonModelBase):
     def __train(self, X, y):
         print("Preprocessing data...")
         X = self.__preprocess(X)
-
+        
         print("Training model...")
         kf = KFold(n_splits=self.n_splits, shuffle=True)
         preds = np.zeros(len(X))
@@ -92,6 +92,53 @@ class LGBMDefault(CarbonModelBase):
         for idx, model in enumerate(tqdm(models, total = self.n_splits, desc="Save")):
             model.save_model(f"{base_dir}/{self.__get_filename(idx)}", 
                             num_iteration=model.best_iteration)
+        
+
+    def eval(self, X, y):
+        _, s_r2 = self.__train(X, y)
+
+        return s_r2
+
+
+    def predict(self, X):
+        X = self.__preprocess(X)
+        X = X.drop("co2_total", axis=1)
+        return list(np.mean([model.predict(X) for model in self.models], axis=0))
+
+
+
+from lightgbm import LGBMRegressor
+
+class LGBMQuantileRegression(LGBMDefault):
+    def __init__(self):
+        super().__init__()
+
+    
+    def __train_qreg(self, X, y):
+        self.params["objective"] = "quantile"
+
+        quantile_alphas = [0.1, 0.9]
+
+        lgb_quantile_alphas = []
+        for quantile_alpha in tqdm(quantile_alphas, desc="Training quantiles"):
+            lgb = LGBMRegressor(alpha=quantile_alpha, **self.params)
+            lgb.fit(X, y)
+            lgb_quantile_alphas.append(lgb)
+
+        return lgb_quantile_alphas
+
+
+    def __get_qreg_filename(self, c):
+        return f"{self.__class__.__name__}_{c}.qreg_model"
+
+
+    def train(self, X, y, base_dir=None):
+        super().train(X, y, base_dir)
+        
+        qreg_low, qreg_high = self.__train_qreg(X, y)
+
+        qreg_low.booster_.save_model(f"{base_dir}/{self.__get_qreg_filename('low')}")
+        qreg_high.booster_.save_model(f"{base_dir}/{self.__get_qreg_filename('high')}")
 
 
     def eval(self, X, y):
