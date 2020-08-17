@@ -5,6 +5,7 @@ import numpy as np
 from models import AVAILABLE_MODELS
 from models import AVAILABLE_MODELS
 from server import cpapi
+from tqdm import tqdm
 
 def get_data(repo_url, repo_data_directory, data_format='tgz', dataset_id=None):
     clone_dir = '/tmp/emission_data'
@@ -26,15 +27,18 @@ def get_data(repo_url, repo_data_directory, data_format='tgz', dataset_id=None):
         os.system(f'rm {garbage_file}')
     
     content = sorted(filter(lambda x: x.endswith('.csv'), os.listdir(clone_dir)))
-    return pd.concat((pd.read_csv(f'{clone_dir}/{f}') for f in content))
+    return pd.concat((pd.read_csv(f'{clone_dir}/{f}') for f in tqdm(content, desc="Reading csv")))
 
 def get_data_from_dir(local_data_dir=None, dataset_id=None):
     print(f'Using source data from local dir {local_data_dir}')
     content = sorted(filter(lambda x: x.endswith('.csv'), os.listdir(local_data_dir)))
-    return pd.concat((pd.read_csv(f'{local_data_dir}/{f}') for f in content))
+    return pd.concat((pd.read_csv(f'{local_data_dir}/{f}') for f in tqdm(content, desc="Reading csv")))
 
 def prepare_data(model_name, local_data=False, local_data_dir=None, repo_url=None, repo_data_directory=None, data_format='tgz', dataset_id=None):
     X = None
+
+    print("Loading csv files, this may take a while...")
+
     if (local_data):
         X = get_data_from_dir(local_data_dir,dataset_id)
     else:

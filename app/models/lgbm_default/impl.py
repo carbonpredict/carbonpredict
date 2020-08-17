@@ -3,6 +3,7 @@ import lightgbm as lgb
 import numpy as np
 from sklearn.model_selection import KFold
 from sklearn.metrics import mean_squared_error, r2_score
+from tqdm import tqdm
 
 class LGBMDefault(CarbonModelBase):
 
@@ -20,7 +21,8 @@ class LGBMDefault(CarbonModelBase):
                 'n_jobs': -1,
                 'num_leaves': 300,
                 'objective': 'regression',
-                'seed': 42}
+                'seed': 42,
+                'verbose': -1}
         self.n_splits = 5
 
 
@@ -36,8 +38,10 @@ class LGBMDefault(CarbonModelBase):
 
 
     def __train(self, X, y):
+        print("Preprocessing data...")
         X = self.__preprocess(X)
 
+        print("Training model...")
         kf = KFold(n_splits=self.n_splits, shuffle=True)
         preds = np.zeros(len(X))
         nrounds = 5000
@@ -45,7 +49,7 @@ class LGBMDefault(CarbonModelBase):
 
         models = []
 
-        for fold, (trn_idx, val_idx) in enumerate(kf.split(X, y)):
+        for fold, (trn_idx, val_idx) in enumerate(tqdm(kf.split(X, y), total = self.n_splits, desc="Folds")):
             X_train, y_train = X.iloc[trn_idx], y.iloc[trn_idx]
             X_valid, y_valid = X.iloc[val_idx], y.iloc[val_idx]
 
@@ -57,7 +61,7 @@ class LGBMDefault(CarbonModelBase):
                             nrounds,
                             valid_sets = [trn_data, val_data],
                             early_stopping_rounds = early_stopping_rounds,
-                            verbose_eval = 100)
+                            verbose_eval = False)
 
             preds[val_idx] = lgb_clf.predict(X_valid)
 
@@ -76,14 +80,16 @@ class LGBMDefault(CarbonModelBase):
     def load(self, base_dir):
         self.models = []
 
-        for idx in range(self.n_splits):
+        for idx in tqdm(range(self.n_splits)):
             self.models.append(lgb.Booster(model_file=f"{base_dir}/{self.__get_filename(idx)}"))
 
 
     def train(self, X, y, base_dir=None):
         models, _ = self.__train(X, y)
 
-        for idx, model in enumerate(models):
+        print(f"Saving model to {base_dir}/")
+
+        for idx, model in enumerate(tqdm(models, total = self.n_splits, desc="Save")):
             model.save_model(f"{base_dir}/{self.__get_filename(idx)}", 
                             num_iteration=model.best_iteration)
 
