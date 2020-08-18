@@ -46,7 +46,7 @@ Alternatively, you can use CURL directly to send the product parameters in JSON 
 
 ## Current machine learning models
 
-**Gradient boosting** (*lgbm_default*):  Root mean squared error (RMSE) = 12.5, r2 (coefficient of determination) = 0.7935093722105526. Makes on average a 12,5 gram error on a single CO2e prediction.
+**Gradient boosting** (*lgbm_default* or *lgbm_qreg*):  Root mean squared error (RMSE) = 12.5, r2 (coefficient of determination) = 0.7935093722105526. Makes on average a 12,5 gram error on a single CO2e prediction. Quantile regression (*lgbm_qreg*) version provides additionally confidence intervals, while lgb default model (*lgbm_default*) tries to provide as accurate prediction as possible. 
 
 **Simple K-nearest neighbors** (*k_nearest_neighbors*) (using only 3 categories, fabric_type & size):  RMSE = 19.476921284404497, R2 = 0.5095385877102603. Makes on average a 19,5 gram error on a single CO2e prediction
 
