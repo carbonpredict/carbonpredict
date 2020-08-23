@@ -83,7 +83,14 @@ def do_prediction(model_name, csv_file, base_dir):
 
     X = pd.read_csv(csv_file)
 
-    return model.predict(X)
+    predictions = model.predict(X)
+    # Ensure that predictions are non-negative
+    predictions = pd.DataFrame(predictions).applymap(lambda x: max(x, 0))
+    
+    if (predictions.shape[1] > 1):
+        print('Warning: model returned more than one value per sample, using only the first value for each sample')
+    predictions = predictions.iloc[:, 0].tolist()
+    return predictions
 
 def get_models():
     return list(AVAILABLE_MODELS.keys())
@@ -107,8 +114,12 @@ def do_prediction_with_params(model, params):
     X = X.astype({'ftp_acrylic': 'float64', 'ftp_cotton': 'float64', 'ftp_elastane': 'float64', 'ftp_linen': 'float64', 'ftp_other': 'float64', 'ftp_polyamide': 'float64', 'ftp_polyester': 'float64', 'ftp_polypropylene': 'float64', 'ftp_silk': 'float64', 'ftp_viscose': 'float64', 'ftp_wool': 'float64', 'label': 'bool', 'unspsc_code': 'bool'})
 
     prediction = model.predict(X)
-    # The models return a list of predictions as float64. For the server, we are only predicting one sample and need to return a string (not a list), so return the first and only member of the list as a string.
-    prediction = str(prediction[0])
+    
+    # The models return a list of predictions. For the server, we are only predicting one sample and need to return a string (not a list), so return the first and only member of the list as a string.
+    
+    # Ensure that prediction is non-negative
+    prediction = max(prediction[0], 0)
+    prediction = str(prediction)
     return prediction
 
 if __name__ == '__main__':
