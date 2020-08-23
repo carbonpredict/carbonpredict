@@ -147,8 +147,6 @@ class LGBMQuantileRegression(LGBMDefault):
 
 
     def load(self, base_dir):
-        super().load(base_dir)
-
         self.qreg_low = lgb.Booster(model_file=f"{base_dir}/{self.__get_qreg_filename('low')}")
         self.qreg_mid = lgb.Booster(model_file=f"{base_dir}/{self.__get_qreg_filename('mid')}")
         self.qreg_high = lgb.Booster(model_file=f"{base_dir}/{self.__get_qreg_filename('high')}")
