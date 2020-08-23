@@ -48,7 +48,7 @@ Alternatively, you can use CURL directly to send the product parameters in JSON 
 
 **Gradient boosting** (*lgbm_default* or *lgbm_qreg*):  Root mean squared error (RMSE) = 12.5, r2 (coefficient of determination) = 0.7935093722105526. Makes on average a 12,5 gram error on a single CO2e prediction. Quantile regression (*lgbm_qreg*) version provides additionally confidence intervals, while lgb default model (*lgbm_default*) tries to provide as accurate prediction as possible. 
 
-**Neural network one-layer model** (*neural_onelayer*): RMSE = 10.049816131591797, R2 = 0.8650490494460144. A neural network model with one hidden layer (with 1024 neurons). Implemented using Pytorch. Makes on average a 10,0 gram error on a single CO2e prediction.
+**Neural network one-layer model** (*neural_onelayer*): RMSE = 10.049816131591797, R2 = 0.8650490494460144. A neural network model with one hidden layer (with 1024 neurons). Implemented using Pytorch. The model uses a GPU for training, evaluation and prediction is a GPU is available in the environment (note: when running in Docker container, you must make the GPU available within the container). Makes on average a 10,0 gram error on a single CO2e prediction.
 
 **Simple K-nearest neighbors** (*k_nearest_neighbors*) (using only 3 categories, fabric_type & size):  RMSE = 19.476921284404497, R2 = 0.5095385877102603. Makes on average a 19,5 gram error on a single CO2e prediction
 
