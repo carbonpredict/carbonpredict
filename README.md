@@ -48,7 +48,15 @@ Alternatively, you can use CURL directly to send the product parameters in JSON 
 
 **Gradient boosting** (*lgbm_default* or *lgbm_qreg*):  Root mean squared error (RMSE) = 12.5, r2 (coefficient of determination) = 0.7935093722105526. Makes on average a 12,5 gram error on a single CO2e prediction. Quantile regression (*lgbm_qreg*) version provides additionally confidence intervals, while lgb default model (*lgbm_default*) tries to provide as accurate prediction as possible. 
 
+**Neural network one-layer model** (*neural_onelayer*): RMSE = 10.049816131591797, R2 = 0.8650490494460144. A neural network model with one hidden layer (with 1024 neurons). Implemented using Pytorch. Makes on average a 10,0 gram error on a single CO2e prediction.
+
 **Simple K-nearest neighbors** (*k_nearest_neighbors*) (using only 3 categories, fabric_type & size):  RMSE = 19.476921284404497, R2 = 0.5095385877102603. Makes on average a 19,5 gram error on a single CO2e prediction
+
+## Adding new models
+- Make your model implement the absract class CarbonModelBase defined in package models. Your model's *train* method must save your model into the path base_dir given as a parameter, and the *load* method must load your model from the given base_dir.
+- Add your model files to a subdirectory under the package models
+- Import and list your model in the list AVAILABLE_MODELS in models/\__init__.py
+- Check that the packages you use are listed in the file *requirements.txt* and add packages if needed
 
 ## Used source data
 The used source data is published in the [emission-sample-data repository](https://github.com/Compensate-Operations/emission-sample-data) by [Compensate](https://compensate.com/).

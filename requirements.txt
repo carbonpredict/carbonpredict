@@ -1,8 +1,9 @@
-numpy
-pandas
-sklearn
-lightgbm
 bayesian-optimization
 flask
 flasgger
+lightgbm
+numpy
+pandas
+sklearn
+torch
 tqdm
