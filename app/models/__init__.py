@@ -55,10 +55,12 @@ class CarbonModelBase(ABC):
 from .dummy import DummyModel
 from .lgbm_default import LGBMDefault, LGBMQuantileRegression
 from .k_nearest_neighbors import KNearestNeighbors
+from .neural_one_layer import NeuralNetworkOneLayerFF
 
 # Add your model to AVAILABLE_MODELS as name: Model entry. 
 # Name is used in the command line to select the model.
 AVAILABLE_MODELS = {'dummy': DummyModel, 
                     'k_nearest_neighbors': KNearestNeighbors,
                     'lgbm_default': LGBMDefault,
-                    'lgbm_qreg': LGBMQuantileRegression}
+                    'lgbm_qreg': LGBMQuantileRegression,
+                    'neural_onelayer': NeuralNetworkOneLayerFF}
