@@ -116,6 +116,16 @@ responses:
   '201':
     description: Created
     content:
-      text/plain:
+      application/json:
         schema:
-          type: number
+          type: object
+          properties:
+            prediction:
+              type: number
+              description: CO2e prediction
+            5-percentile: 
+              type: number
+              description: CO2e prediction interval 5-percentile 
+            95-percentile:
+              type: number
+              description: CO2e prediction interval 95-percentile 

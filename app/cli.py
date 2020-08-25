@@ -76,19 +76,31 @@ def do_eval(model_name, local_data=False, local_data_dir=None,
 
     return r2_score
 
-def do_prediction(model_name, csv_file, base_dir):
+def format_predictions(predictions, intervals=False):
+    """Ensure that predictions are non-negative and format them to a python list (or list of lists for the intervals option)"""
+    predictions = pd.DataFrame(predictions).applymap(lambda x: max(x, 0))
+    
+    if intervals and predictions.shape[1] != 3:
+        print(f'Warning: model returned an incorrect number of values per sample (should be 3, was {predictions.shape[1]}). Returning tuples containing all values per sample.')
+        predictions = predictions.values.tolist()
+    elif intervals:
+        print('Returning triplets (mean, 5-percentile, 95-percentile)')
+        predictions = predictions.values.tolist()
+    elif predictions.shape[1] > 1:
+        print('Warning: model returned more than one value per sample, using only the first value for each sample')
+        predictions = predictions.iloc[:, 0].tolist()
+    else: 
+        predictions = predictions.iloc[:, 0].tolist()
+    return predictions
+
+def do_prediction(model_name, csv_file, base_dir, intervals=False):
     model = AVAILABLE_MODELS[model_name]()
     model.load(base_dir)
 
     X = pd.read_csv(csv_file)
 
     predictions = model.predict(X)
-    # Ensure that predictions are non-negative
-    predictions = pd.DataFrame(predictions).applymap(lambda x: max(x, 0))
-    
-    if (predictions.shape[1] > 1):
-        print('Warning: model returned more than one value per sample, using only the first value for each sample')
-    predictions = predictions.iloc[:, 0].tolist()
+    predictions = format_predictions(predictions, intervals)
     return predictions
 
 def get_models():
@@ -110,7 +122,7 @@ def load_model(model_name):
     model.load(base_dir)
     return model
 
-def do_prediction_with_params(model, params):
+def convert_params_to_df(params):
     X = pd.DataFrame.from_records([params])
     X = X.reindex(sorted(X.columns), axis=1)
     
@@ -121,15 +133,14 @@ def do_prediction_with_params(model, params):
     # Note: in the first dataset completely empty columns label and unspc_code are defined as bools here (lgbm is apparently using them and breaks if they are not int, float or bool). 
     # They should be treated some other way. The K-NN model drops them before further processing, so data type does not matter for it.
     X = X.astype({'ftp_acrylic': 'float64', 'ftp_cotton': 'float64', 'ftp_elastane': 'float64', 'ftp_linen': 'float64', 'ftp_other': 'float64', 'ftp_polyamide': 'float64', 'ftp_polyester': 'float64', 'ftp_polypropylene': 'float64', 'ftp_silk': 'float64', 'ftp_viscose': 'float64', 'ftp_wool': 'float64', 'label': 'bool', 'unspsc_code': 'bool'})
+    return X
 
-    prediction = model.predict(X)
+def do_prediction_with_params(model, params, intervals=False):
+    X = convert_params_to_df(params)
+    predictions = model.predict(X)
     
-    # The models return a list of predictions. For the server, we are only predicting one sample and need to return a string (not a list), so return the first and only member of the list as a string.
-    
-    # Ensure that prediction is non-negative
-    prediction = max(prediction[0], 0)
-    prediction = str(prediction)
-    return prediction
+    predictions = format_predictions(predictions, intervals)
+    return predictions
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Carbon Models')
@@ -150,6 +161,7 @@ if __name__ == '__main__':
     predict_parser = subparsers.add_parser('predict')
     predict_parser.add_argument('model', type=str, help='Select model')
     predict_parser.add_argument('csv_file', type=str, help='CSV file')
+    predict_parser.add_argument('--intervals', action='store_true', help='Show 0.05 and 0.95 prediction intervals')
     
     server_parser = subparsers.add_parser('run-server')
     
@@ -177,12 +189,15 @@ if __name__ == '__main__':
         else:
             print(f'Error: model {args.model} is not available')
     elif args.subcommand == 'predict':
-        if args.model in AVAILABLE_MODELS:
+        trained_models = get_trained_models()
+        if args.model in trained_models:
             pd.set_option('display.max_rows', None)
-            predictions = do_prediction(args.model, args.csv_file, base_dir)
+            predictions = do_prediction(args.model, args.csv_file, base_dir, args.intervals)
             print(predictions)
+        elif args.model in AVAILABLE_MODELS:
+            print(f'Error: model {args.model} is available but not trained. Please train the model first.')
         else:
-            print(f'Error: model {args.model} is not available')
+            print(f'Error: model {args.model} is not available, check available models with command models.')
     elif args.subcommand == 'models':
         print('Available models:', get_models())
         sys.exit(0)
