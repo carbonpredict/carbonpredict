@@ -1,7 +1,7 @@
 #!flask/bin/python
 from flask import Flask, jsonify, abort, make_response, request, url_for
 from werkzeug.utils import secure_filename
-from cli import do_eval, do_prediction_with_params, do_train, get_models, load_model
+from cli import do_eval, do_prediction_with_params, do_train, get_models, get_trained_models, load_model
 from flasgger import Swagger, swag_from
 import os
 import time
@@ -117,6 +117,16 @@ def models():
     models = get_models()
     print(f'Available models: {models}')
     return jsonify(models), 200
+
+@app.route('/ccaas/api/v0.1/trained_models', methods=['GET'])
+@swag_from('trained_models.yml')
+def trained_models():
+    """
+    List trained models
+    """
+    trained_models = get_trained_models()
+    print(f'Trained models: {trained_models}')
+    return jsonify(trained_models), 200
 
 def run():
     flask_run_host = os.environ.get('FLASK_RUN_HOST', '0.0.0.0')

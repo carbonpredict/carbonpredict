@@ -1,0 +1,13 @@
+List trained models available to predict product CO2-equivalents
+Described using OpenAPI Specification ver. 2 (formerly known as Swagger)
+---
+summary: List trained machine learning models
+responses:
+  '200':
+    description: Success
+    content:
+      application/json:
+        schema:
+          type: array
+          items:
+            type: string
