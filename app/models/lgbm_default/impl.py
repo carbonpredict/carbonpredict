@@ -75,7 +75,7 @@ class LGBMDefault(CarbonModelBase):
 
 
     def __get_filename(self, fold):
-        return f"{self.__class__.__name__}_{fold}.model"
+        return f"lgbm_default-{fold}.model"
 
 
     def load(self, base_dir):
@@ -133,7 +133,7 @@ class LGBMQuantileRegression(LGBMDefault):
 
 
     def __get_qreg_filename(self, c):
-        return f"{self.__class__.__name__}_{c}.qreg_model"
+        return f"lgbm_qreg-{c}.model"
 
 
     def train(self, X, y, base_dir=None):

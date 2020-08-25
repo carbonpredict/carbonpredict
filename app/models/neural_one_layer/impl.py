@@ -39,7 +39,7 @@ class NeuralNetworkOneLayerFF:
         self.model = None
     
     def __set_filename(self):
-        self.filename = f"neural-onelayer_hidden_{self.hidden_neurons}.model"
+        self.filename = f"neural_onelayer-hidden_{self.hidden_neurons}.model"
 
     #def preprocess(self, X):
     def __preprocess(self, X):
