@@ -101,7 +101,7 @@ def get_trained_models():
     """
     base_dir = os.environ.get('MODEL_DIR', './')
     model_files = sorted(filter(lambda x: x.endswith('.model'), os.listdir(base_dir)))
-    model_names = set(map(lambda n: n.split('-')[0], model_files))
+    model_names = sorted(set(map(lambda n: n.split('-')[0], model_files)))
     return model_names
 
 def load_model(model_name):
@@ -139,6 +139,8 @@ if __name__ == '__main__':
                                     dest='subcommand')
 
     models_parser = subparsers.add_parser('models')
+
+    models_parser = subparsers.add_parser('trained_models')
     
     train_parser = subparsers.add_parser('train')
     train_parser.add_argument('model', type=str, help='Select model')
