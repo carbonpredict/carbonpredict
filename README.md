@@ -26,7 +26,10 @@ The solution is dockerized. Install Docker on your machine, instructions at the 
 Currently the image is not offered through Dockerhub. Build the image locally by cloning this repository, navigating to the repo's root folder and running the command `docker build -t carbon .`. This builds the Docker image with the tag *carbon*. The other docker commands are run using this image.
 
 ### List models
-To list the available models, run `docker-compose run carbon models`.
+To list the models available to be trained, run `docker-compose run carbon models`.
+
+### List trained models
+To list the trained models ready to be called on to predict CO2 equivalents, run `docker-compose run carbon trained_models`.
 
 ### Train model
 To train a model (here *lgbm_default*, a gradient boosting model) with the source data, run `docker-compose run carbon train lgbm_default`. Substitute the model name as the last parameter in the command. This will mount your subdirectory */mnt_models* into the container, train a model and save it to the subdirectory.
@@ -68,7 +71,10 @@ All APIs documented also using OpenAPI (version 2), UI available at http://*host
 See *[prediction API definition](predict_api.md)*.
 
 ### Models API
-Endpoint: */ccaas/api/v0.1/models* (GET). Returns a JSON array of model names available. Example response body: ["dummy", "k_nearest_neighbors", "lgbm_default"].
+Endpoint: */ccaas/api/v0.1/models* (GET). Returns a JSON array of model names available to be trained. Example response body: ["k_nearest_neighbors", "lgbm_default", "neural_onelayer"].
+
+### Trained models API
+Endpoint: */ccaas/api/v0.1/trained_models* (GET). Returns a JSON array of names of trained models. Example response body: ["k_nearest_neighbors", "lgbm_default"].
 
 ### Train API
 Endpoint: */ccaas/api/v0.1/train* (POST). HTTP body is type application/json and contains the training data and machine learning model definition in JSON format. NOTE: Training is a slow operation and might take e.g. 5-30 minutes depending on the model, source data size and host machine resources.
