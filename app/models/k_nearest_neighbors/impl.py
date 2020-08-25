@@ -27,7 +27,7 @@ class KNearestNeighbors(CarbonModelBase):
         self.model = None
     
     def __set_filename(self):
-        self.filename = f"k-nearestneighbor_k_{self.n_neighbors}_training_samples_{self.training_samples}.model"
+        self.filename = f"k_nearest_neighbors-k_{self.n_neighbors}_training_samples_{self.training_samples}.model"
 
     def __preprocess(self, X):
         # Drop empty features (dataset v. 1.0.0): unspsc_code, label 

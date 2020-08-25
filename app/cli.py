@@ -3,7 +3,6 @@ import argparse
 import pandas as pd
 import numpy as np
 from models import AVAILABLE_MODELS
-from models import AVAILABLE_MODELS
 from server import cpapi
 from tqdm import tqdm
 
@@ -95,6 +94,16 @@ def do_prediction(model_name, csv_file, base_dir):
 def get_models():
     return list(AVAILABLE_MODELS.keys())
 
+def get_trained_models():
+    """
+    The model files must begin with the exact name of the model (defined in AVAILABLE_MODELS) followed by a short hyphen -
+    and must use the file type .model (e.g. k_nearest_neighbors-k_9_training_samples_100000.model).
+    """
+    base_dir = os.environ.get('MODEL_DIR', './')
+    model_files = sorted(filter(lambda x: x.endswith('.model'), os.listdir(base_dir)))
+    model_names = set(map(lambda n: n.split('-')[0], model_files))
+    return model_names
+
 def load_model(model_name):
     base_dir = os.environ.get('MODEL_DIR', './')
     model = AVAILABLE_MODELS[model_name]()
@@ -174,6 +183,9 @@ if __name__ == '__main__':
             print(f'Error: model {args.model} is not available')
     elif args.subcommand == 'models':
         print('Available models:', get_models())
+        sys.exit(0)
+    elif args.subcommand == 'trained_models':
+        print('Trained models:', get_trained_models())
         sys.exit(0)
     elif args.subcommand == 'run-server':
         print('Starting web server...')
