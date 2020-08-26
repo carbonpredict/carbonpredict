@@ -122,10 +122,14 @@ responses:
           properties:
             prediction:
               type: number
-              description: CO2e prediction
+              description: CO2e prediction in kg
             5-percentile: 
               type: number
-              description: CO2e prediction interval 5-percentile 
+              description: CO2e prediction interval 5-percentile, null if not available for model
             95-percentile:
               type: number
-              description: CO2e prediction interval 95-percentile 
+              description: CO2e prediction interval 95-percentile, null if not available for model
+          example:
+            prediction: 2.8923212
+            5-percentile: 1.2988872
+            95-percentile: 6.610098
