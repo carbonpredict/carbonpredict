@@ -37,26 +37,26 @@ To train a model (here *lgbm_default*, a gradient boosting model) with the sourc
 As default, the train command clones the source data files (about 1 GB) into the container from a remote git repository. If you have the CSV-format source data files on your local computer, you can copy them into the subfolder */mnt_emission_data* and use the switch *--local_data* to use local data (from a docker-mounted directory) instead of cloning the data into the container. Example using the switch: `docker-compose run carbon train lgbm_default --local_data`
 
 ### Predict
-To predict a CO2e value using a trained model, run a command like `docker-compose run carbon predict lgbm_default ./testdata/test.csv`, where the last two parameters are a trained model to use and the location of the csv file to do the predictions for. The columns of the CSV file must currently be in the exact order (and including the empty target column *co2_total*):
-brand,category-1,category-2,category-3,co2_total,colour,fabric_type,ftp_acrylic,ftp_cotton,ftp_elastane,ftp_linen,ftp_other,ftp_polyamide,ftp_polyester,ftp_polypropylene,ftp_silk,ftp_viscose,ftp_wool,gender,label,made_in,season,size,unspsc_code,weight
+To predict a CO2e value using a trained model, run a command like `docker-compose run carbon predict lgbm_default ./testdata/test.csv`, where the last two parameters are a trained model to use and the location of the csv file to do the predictions for. The columns of the CSV file must currently be in the exact order (and including the empty target column *co2_total*): brand,category-1,category-2,category-3,co2_total,colour,fabric_type,ftp_acrylic,ftp_cotton,ftp_elastane,ftp_linen,ftp_other,ftp_polyamide,ftp_polyester,ftp_polypropylene,ftp_silk,ftp_viscose,ftp_wool,gender,label,made_in,season,size,unspsc_code,weight
 
 ### Run server
-To run the demo server, which offers an HTTP endpoint for calling the predict command, run `docker-compose run --service-ports carbon run-server`. 
+To run the Flask server, which offers HTTP API endpoints (see list below), run `docker-compose run --service-ports carbon run-server`. 
 
-After the server is started, you can test the API using the **OpenAPI UI** (a.k.a. Swagger UI) by going to http://*hostname*:5000/apidocs/.
-
-Alternatively, you can use CURL directly to send the product parameters in JSON format in an HTTP POST message. Example using curl (to be run inside directory */testdata*) using example data in file */testdata/wsocks.json*: `curl -i -H "Content-Type: application/json" -X POST --data "@wsocks.json" http://localhost:5000/ccaas/api/v0.1/predict`   
+After the server is started, you can test the API using the **OpenAPI UI** (a.k.a. Swagger UI) by going to http://*hostname*:5000/apidocs/ (when run locally http://localhost:5000/apidocs/ or http://0.0.0.0:5000/apidocs/).
 
 ## Current machine learning models
 
 **Gradient boosting** (*lgbm_default* or *lgbm_qreg*):  Root mean squared error (RMSE) = 12.5, r2 (coefficient of determination) = 0.7935093722105526. Makes on average a 12,5 gram error on a single CO2e prediction. Quantile regression (*lgbm_qreg*) version provides additionally confidence intervals, while lgb default model (*lgbm_default*) tries to provide as accurate prediction as possible. 
 
-**Neural network one-layer model** (*neural_onelayer*): RMSE = 10.049816131591797, R2 = 0.8650490494460144. A neural network model with one hidden layer (with 1024 neurons). Implemented using Pytorch. The model uses a GPU for training, evaluation and prediction is a GPU is available in the environment (note: when running in Docker container, you must make the GPU available within the container). Makes on average a 10,0 gram error on a single CO2e prediction.
+**Neural network one-layer model** (*neural_onelayer*): RMSE = 10.049816131591797, R2 = 0.8650490494460144. A neural network model with one hidden layer (with 1024 neurons). Implemented using Pytorch. The model uses a GPU for training, evaluation and prediction is a GPU is available in the environment (note: when running in Docker container, you must make the GPU available within the container). Makes on average a 10,0 gram error on a single CO2e prediction. Note: the version in the app is trained using plain stochastic gradient descent optimizer. It trains to the presented stats in about 10-15 epochs. There is a pretrained model in the subfolder */pretrained_models*, which has been trained using an Adagrad optimizer and has reached stats RMSE = 9.818843841552734, R2 = 0.8709932800614041 in 69 epochs. As the performance difference in negligible and training speed much faster, the SGD optimizer is used in the app code. For the Adagrad version, see notebook Neural-network.ipynb.
 
-**Simple K-nearest neighbors** (*k_nearest_neighbors*) (using only 3 categories, fabric_type & size):  RMSE = 19.476921284404497, R2 = 0.5095385877102603. Makes on average a 19,5 gram error on a single CO2e prediction
+**Simple K-nearest neighbors** (*k_nearest_neighbors*) (using only category-1, category-2, category-3, fabric_type and size):  RMSE = 19.476921284404497, R2 = 0.5095385877102603. Makes on average a 19,5 gram error on a single CO2e prediction
+
+### Pretrained models
+There are pretrained models available in the subfolder *[/pretrained_models_textile-v1.0.0](/pretrained_models_textile-v1.0.0)*. There models have been trained using the dataset *textile-v.1.0.0*. If you want to use these models, you can copy the model files to the directory */mnt_models*. You can then use the models for predictions (without training new ones). Note: if you have copied a model file into the folder */mnt_models* and run the training of a model again, the model file in */mnt_models* will be overwritten.
 
 ## Adding new models
-- Make your model implement the absract class CarbonModelBase defined in package models. Your model's *train* method must save your model into the path base_dir given as a parameter, and the *load* method must load your model from the given base_dir.
+- Make your model implement the absract class CarbonModelBase defined in package models. Your model's *train* method must save your model into the path base_dir given as a parameter, and the *load* method must load your model from the given base_dir. The model file's name must start with the model's name followed by a hyphen (-) and use file extension .model (e.g. *k_nearest_neighbors-k_9_training_samples_100000.model*)
 - Add your model files to a subdirectory under the package models
 - Import and list your model in the list AVAILABLE_MODELS in models/\__init__.py
 - Check that the packages you use are listed in the file *requirements.txt* and add packages if needed
@@ -69,6 +69,8 @@ All APIs documented also using OpenAPI (version 2), UI available at http://*host
 
 ### Prediction API
 See *[prediction API definition](predict_api.md)*.
+
+As an alternative to using the OpenAPI UI, You can use CURL directly to send the product parameters to the predict endpoint in JSON format in an HTTP POST message. Example using curl (to be run inside directory */testdata*) using example data in file */testdata/wsocks.json*: `curl -i -H "Content-Type: application/json" -X POST --data "@wsocks.json" http://localhost:5000/ccaas/api/v0.1/predict`
 
 ### Models API
 Endpoint: */ccaas/api/v0.1/models* (GET). Returns a JSON array of model names available to be trained. Example response body: ["k_nearest_neighbors", "lgbm_default", "neural_onelayer"].
@@ -90,6 +92,7 @@ Endpoint: */ccaas/api/v0.1/train* (POST). HTTP body is type application/json and
 ```
 
 ## Possible future features
+- Add prediction intervals (5-percentile and 95-percentile) to more models
 - Extend software to support other product categories
 
 ## Contributors

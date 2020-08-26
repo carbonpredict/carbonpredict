@@ -34,7 +34,7 @@ def predict():
     """
     if (not request.json):
         abort(400)
-    
+     
     product = {
     'brand': request.json['brand'],
     'category-1': request.json['category-1'],
@@ -72,10 +72,24 @@ def predict():
         print(f'Loading model: {ml_model}')
     model = load_model(ml_model)
     print('Model loaded')
-    CO2e = do_prediction_with_params(model, product)
+    
+    pred_with_intervals = do_prediction_with_params(model, product, intervals=True)
+    
+    prediction = pred_with_intervals[0][0]
+    percentile_5 = pred_with_intervals[0][1] if len(pred_with_intervals[0]) == 3 and pred_with_intervals[0][1] is not None else None
+    percentile_95 = pred_with_intervals[0][2] if len(pred_with_intervals[0]) == 3 and pred_with_intervals[0][2] is not None else None
+    result = {
+        "prediction": prediction,
+        "5-percentile": percentile_5,
+        "95-percentile": percentile_95
+    }
+    
     print('CO2e prediction complete, returning result')
-    print(CO2e)
-    return CO2e, 201
+    print(result)
+    
+    resp = jsonify(result)
+    resp.status_code = 201
+    return resp
 
 @app.route('/ccaas/api/v0.1/train', methods=['POST'])
 @swag_from('train.yml')
