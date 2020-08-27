@@ -12,10 +12,7 @@ import joblib
 
 class LinearRegression(CarbonModelBase):
     """
-    Linear regression model. By default does not use the 'weight' feature in training or uses it in spesific ways as follows, weight =
-        - 'd' (default), drops the weight feature (column) and does not use it in training,
-        - 'm', drops the samples (rows) from training where the weight feature is missing
-        - 'a', uses also the samples (rows) where weigth feature is missing.
+    Linear regression model. Weight feature is dropped from from the training. Otherwise all other features are used.
     """
     def __init__(self):
         self.fit_intercept = True
@@ -111,7 +108,7 @@ class LinearRegression(CarbonModelBase):
         print('Split to training and testing data')
 
         # Initialize and train linear model
-        model = linear_model.LinearRegression()
+        model = linear_model.LinearRegression(fit_intercept=True)
         print('Model initialized')
         model.fit(X_train, y_train)
         print('Model trained')
@@ -144,4 +141,5 @@ class LinearRegression(CarbonModelBase):
 
     def predict(self, X):
         X = self.__preprocess(X)
+        X = X.drop('co2_total', axis=1)
         return self.model.predict(X)
