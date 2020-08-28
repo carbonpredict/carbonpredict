@@ -208,9 +208,12 @@ class NeuralNetworkOneLayerFF:
         train_dataloader, test_dataloader = self.__get_dataloader(X, y)        
         
         model = OneLayerModel(334, hidden_neurons, 1, bs).to(device)
-        optimizer = torch.optim.SGD(model.parameters(), lr=lr, momentum=0.9) # Use stochastic gradient descent
-        criterion = nn.MSELoss(reduction='mean')
         
+        #optimizer = torch.optim.SGD(model.parameters(), lr=lr, momentum=0.9) # Stochastic gradient descent
+        #optimizer = torch.optim.Adagrad(model.parameters(), lr=lr)
+        optimizer = torch.optim.Adam(model.parameters(), lr=lr)
+
+        criterion = nn.MSELoss(reduction='mean')
         
         print(f"Starting training of neural network one hidden layer model with {hidden_neurons} hidden layer neurons and batch size {bs}")
         model, _ = self.__train(train_dataloader, test_dataloader, model, optimizer, criterion, device)
