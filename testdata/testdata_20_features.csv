@@ -1,0 +1,12 @@
+brand,category-1,category-2,category-3,co2_total,colour,fabric_type,ftp_acrylic,ftp_cotton,ftp_elastane,ftp_linen,ftp_other,ftp_polyamide,ftp_polyester,ftp_polypropylene,ftp_silk,ftp_viscose,ftp_wool,gender,label,made_in,season,size,unspsc_code,weight
+,menswear,clothing,trousers,22.28812171,,W,0,0.98,0.02,0,0,0,0,0,0,0,0,M,,KH,AYR,L,,0.61
+,womenswear,dress,dress,11.07934286,,W,0,0,0,0,0,0,0,0,0,1,0,W,,CN,AYR,M,,0.27
+,clothing,sportswear,hoodie,12.97041293,,W,0,0.6,0,0,0,0,0.4,0,0,0,0,U,,FI,AYR,L,,0.4
+,menswear,clothing,T-shirt,5.705409684,,W,0,1,0,0,0,0,0,0,0,0,0,M,,TR,AYR,L,,0.16
+,menswear,clothing,knitwear,16.94858377,,K,0,0,0,0,0,0,0,0,0,0,1,M,,CN,MID,XL,,0.26
+,menswear,clothing,shirt,3.681375512,,K,0,0,0,0.1,0,0,0,0,0.9,0,0,M,,CN,AYR,M,,0.12
+,womenswear,sportswear,pants,9.303890483,,W,0,0,0.02,0,0,0,0.98,0,0,0,0,W,,CN,SUM,M,,0.34
+,womenswear,dress,fancy-dress,4.520658755,,W,0,0.57,0,0,0,0,0,0,0.43,0,0,W,,FI,AYR,L,,0.13
+,menswear,undergarments,underpants,2.188867996,,W,0,0.95,0.02,0,0,0,0.03,0,0,0,0,M,,CN,AYR,L,,0.06
+,womenswear,clothing,knitwear,12.82315257,,K,0,0,0,0,0,0,0.5,0,0,0.5,0,W,,BD,MID,M,,0.38
+,womenswear,outerwear,jacket,19.56687747,,W,0,0,0,0,0,0,1,0,0,0,0,W,,CN,MID,M,,0.73
