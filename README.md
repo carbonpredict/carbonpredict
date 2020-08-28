@@ -2,7 +2,7 @@
 Machine learning pipeline and model to predict CO2e of products
 
 ## What is it?
-*Goal for project ending 8/2020*: The application is a machine learning pipeline that can ingest a source data set, train a model on it and then be able to predict CO2 emission values for clothing products.
+The application is a dockerized machine learning pipeline that can ingest a source data set, train models on it and then be able to predict CO2 emission values for clothing products.
 
 ## Repository contents
 *[/app](/app)* contains the python source code for the main application. For instruction on running the app, see section *How to run it*. 
@@ -11,7 +11,7 @@ Machine learning pipeline and model to predict CO2e of products
 
 *[/pretrained_models_textile-v1.0.0](/pretrained_models_textile-v1.0.0)*. There models have been trained using the dataset *textile-v.1.0.0*.
 
-*[/testdata](/testdata) contains json test data to test the predict API with and csv test data to test the predict (from CLI with).
+*[/testdata](/testdata)* contains json test data to test the predict API with and csv test data to test the predict (from CLI with).
 
 *[/visualizations](/visualizations)* contains some visualizations (png images) of the source data. These have been output from the notebook Visualizations.ipynb.
 
@@ -50,7 +50,7 @@ After the server is started, you can test the API using the **OpenAPI UI** (a.k.
 
 **Neural network one-layer model** (*neural_onelayer*): RMSE = 9.822982788085938, R2 = 0.8707626750063729. A neural network model with one hidden layer (with 1024 neurons). Implemented using Pytorch. The model uses a GPU for training, evaluation and prediction is a GPU is available in the environment (note: when running in Docker container, you must make the GPU available within the container). Makes on average a 9,8 gram error on a single CO2e prediction. 
 
-**Simple K-nearest neighbors** (*k_nearest_neighbors*) (using only category-1, category-2, category-3, fabric_type and size):  RMSE = 19.476921284404497, R2 = 0.5095385877102603. Makes on average a 19,5 gram error on a single CO2e prediction
+**Simple K-nearest neighbors** (*k_nearest_neighbors*) (using only category-1, category-2, category-3, fabric_type and size):  RMSE = 19.476921284404497, R2 = 0.5095385877102603. Makes on average a 19,5 gram error on a single CO2e prediction.
 
 ### Pretrained models
 There are pretrained models available in the subfolder *[/pretrained_models_textile-v1.0.0](/pretrained_models_textile-v1.0.0)*. There models have been trained using the dataset *textile-v.1.0.0*. If you want to use these models, you can copy the model files to the directory */mnt_models*. You can then use the models for predictions (without training new ones). Note: if you have copied a model file into the folder */mnt_models* and run the training of a model again, the model file in */mnt_models* will be overwritten.
@@ -87,7 +87,7 @@ Endpoint: */ccaas/api/v0.1/train* (POST). HTTP body is type application/json and
     "data-format": "tgz",
     "ML-model": "lgbm_default",
     "source-data-directory": "datasets/textile-v1.0.0",
-    "source-data-repo": "https://github.com/Compensate-Operations/emission-sample-data.git",
+    "source-data-repo": "https://github.com/Compensate-Operations/emission-sample-data.git"
 }
 ```
 
