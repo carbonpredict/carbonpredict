@@ -94,7 +94,7 @@ parameters:
         category-3: pants
         colour: dark grey
         fabric_type: K
-        ftp_acrylic": 0
+        ftp_acrylic: 0
         ftp_cotton: 80.0
         ftp_elastane: 0
         ftp_linen: 0
