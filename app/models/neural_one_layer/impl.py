@@ -13,7 +13,6 @@ from torch import nn
 from torch.utils.data import TensorDataset, DataLoader
 
 import os
-import copy
 
 class OneLayerModel(nn.Module):
     def __init__(self, n_input, n_hidden1, n_output, bs):
@@ -34,8 +33,10 @@ class NeuralNetworkOneLayerFF:
     A feedforward neural network model with one hidden layer. The number of neurons in the hidden layer can
     be given as a parameter to the constructor (default 1024). The model will train until 5 epochs have passed without the test RMSE improving. 
     """
-    def __init__(self, hidden_neurons=1024):
+    def __init__(self, hidden_neurons=1024, learning_rate = 0.01, batch_size=1000):
         self.hidden_neurons = hidden_neurons
+        self.lr = learning_rate
+        self.bs = batch_size
         self.__set_filename()
         self.model = None
     
@@ -86,9 +87,8 @@ class NeuralNetworkOneLayerFF:
 
         return X_scaled
 
-    def __save_model(self, base_dir):
-        print(f"Saving neural network one hidden layer model to disk at {base_dir}/{self.filename}")
-        torch.save(self.model, f"{base_dir}/{self.filename}")
+    def __save_model(self, model, base_dir):
+        torch.save(model, f"{base_dir}/{self.filename}")
 
     def __get_dataloader(self, X, y, bs=1000, test_size=0.2):
         X = self.__preprocess(X)
@@ -143,10 +143,9 @@ class NeuralNetworkOneLayerFF:
 
         return torch.mean(torch.tensor(losses)), torch.mean(torch.tensor(rmse_scores)), torch.mean(torch.tensor(r2_scores))
 
-    def __train(self, train_dataloader, test_dataloader, model, optimizer, criterion, device):
+    def __train(self, train_dataloader, test_dataloader, model, optimizer, criterion, device, base_dir, write_model_to_disk=False):
         model.train()
 
-        best_model = None
         best_test_rmse_score = None
         best_test_r2_score = None
         
@@ -181,12 +180,13 @@ class NeuralNetworkOneLayerFF:
                 best_test_rmse_score = test_rmse_score
                 best_test_r2_score = test_r2_score
                 best_score_epoch = epoch
-                best_model = copy.deepcopy(model)
+                if (write_model_to_disk):
+                    self.__save_model(model, base_dir)
             
         print(f"Neural network one hidden layer model trained in {best_score_epoch} epochs with stats RMSE = {best_test_rmse_score}, R2 = {best_test_r2_score}")
-        
-        best_model.eval().to('cpu')
-        return best_model, best_test_r2_score
+        print(f"Saved neural network one hidden layer model to disk at {base_dir}/{self.filename}")
+
+        return best_test_r2_score
     
     def __select_device(self):
         if torch.cuda.is_available():
@@ -199,34 +199,39 @@ class NeuralNetworkOneLayerFF:
     
     def load(self, base_dir):
         print(f"Loading neural network one hidden layer model from disk at {base_dir}/{self.filename}")
-        self.model = torch.load(f"{base_dir}/{self.filename}")
+        model = torch.load(f"{base_dir}/{self.filename}")
+        model.eval()
+        self.model = model
         
     def train(self, X, y, base_dir=None):
         device = self.__select_device()
-        lr = 0.01 # Learning rate
-        bs = 1000 # Batch size
-        hidden_neurons = self.hidden_neurons # Number of hidden layer neurons to use
-
         print(f"Preparing batches of training data")
-        train_dataloader, test_dataloader = self.__get_dataloader(X, y)        
+        train_dataloader, test_dataloader = self.__get_dataloader(X, y)
         
-        model = OneLayerModel(334, hidden_neurons, 1, bs).to(device)
+        model = OneLayerModel(334, self.hidden_neurons, 1, self.bs).to(device)
         
         #optimizer = torch.optim.SGD(model.parameters(), lr=lr, momentum=0.9) # Stochastic gradient descent
         #optimizer = torch.optim.Adagrad(model.parameters(), lr=lr)
-        optimizer = torch.optim.Adam(model.parameters(), lr=lr)
+        optimizer = torch.optim.Adam(model.parameters(), lr=self.lr)
 
         criterion = nn.MSELoss(reduction='mean')
         
-        print(f"Starting training of neural network one hidden layer model with {hidden_neurons} hidden layer neurons and batch size {bs}")
-        model, _ = self.__train(train_dataloader, test_dataloader, model, optimizer, criterion, device)
-        self.model = model
+        print(f"Starting training of neural network one hidden layer model with {self.hidden_neurons} hidden layer neurons and batch size {self.bs}")
+        _ = self.__train(train_dataloader, test_dataloader, model, optimizer, criterion, device, base_dir, write_model_to_disk=True)
         print(f"Training complete")
-        self.__save_model(base_dir)
 
     def eval(self, X, y):
-        print(f"Evaluating neural network one hidden layer model with {hidden_neurons} hidden layer neurons and batch size {bs}")
-        _, s_r2 = self.__train(X, y)
+        device = self.__select_device()
+        print(f"Preparing batches of training data")
+        train_dataloader, test_dataloader = self.__get_dataloader(X, y)
+        
+        model = OneLayerModel(334, self.hidden_neurons, 1, self.bs).to(device)
+        optimizer = torch.optim.Adam(model.parameters(), lr=self.lr)
+
+        criterion = nn.MSELoss(reduction='mean')
+        
+        print(f"Evaluating neural network one hidden layer model with {self.hidden_neurons} hidden layer neurons and batch size {self.bs}")
+        s_r2 = self.__train(train_dataloader, test_dataloader, model, optimizer, criterion, device, base_dir, write_model_to_disk=False)
         return s_r2
 
     def predict(self, X):
