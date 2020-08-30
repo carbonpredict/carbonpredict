@@ -4,7 +4,9 @@ import pandas as pd
 import numpy as np
 from models import AVAILABLE_MODELS
 from server import cpapi
+from sklearn.metrics import mean_squared_error, r2_score
 from tqdm import tqdm
+
 
 def get_data(repo_url, repo_data_directory, data_format='tgz', dataset_id=None):
     clone_dir = '/tmp/emission_data'
@@ -103,6 +105,28 @@ def do_prediction(model_name, csv_file, base_dir, intervals=False):
     predictions = format_predictions(predictions, intervals)
     return predictions
 
+def evaluate_trained_models(csv_file, base_dir):
+    trained_models = get_trained_models()
+    test_data = pd.read_csv(csv_file)
+    y_true = test_data['co2_total'].copy()
+
+    dtypes = np.dtype([
+          ('Model name', str),
+          ('RMSE', float),
+          ('R2', float),
+          ])
+    data = np.empty(0, dtype=dtypes)
+    results = pd.DataFrame(data)
+
+    for idx, model_name in enumerate(trained_models):
+        preds = do_prediction(model_name, csv_file, base_dir)
+        y_pred = pd.DataFrame(preds)
+        results.at[idx, 'Model name'] = model_name
+        results.at[idx,'RMSE'] = mean_squared_error(y_true, y_pred, squared=False)
+        results.at[idx,'R2'] = r2_score(y_true, y_pred)
+
+    print (results)
+
 def get_models():
     return list(AVAILABLE_MODELS.keys())
 
@@ -160,9 +184,12 @@ if __name__ == '__main__':
     
     predict_parser = subparsers.add_parser('predict')
     predict_parser.add_argument('model', type=str, help='Select model')
-    predict_parser.add_argument('csv_file', type=str, help='CSV file')
+    predict_parser.add_argument('csv_file', type=str, help='CSV file with data to predict for')
     predict_parser.add_argument('--intervals', action='store_true', help='Show 0.05 and 0.95 prediction intervals')
     
+    evalmodels_parser = subparsers.add_parser('evaluate_trained_models')
+    evalmodels_parser.add_argument('csv_file', type=str, help='CSV file with test data')
+
     server_parser = subparsers.add_parser('run-server')
     
     if len(sys.argv) <= 1:
@@ -203,6 +230,9 @@ if __name__ == '__main__':
         sys.exit(0)
     elif args.subcommand == 'trained_models':
         print('Trained models:', get_trained_models())
+        sys.exit(0)
+    elif args.subcommand == 'evaluate_trained_models':
+        evaluate_trained_models(args.csv_file, base_dir)
         sys.exit(0)
     elif args.subcommand == 'run-server':
         print('Starting web server...')
