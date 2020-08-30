@@ -13,6 +13,7 @@ from torch import nn
 from torch.utils.data import TensorDataset, DataLoader
 
 import os
+import copy
 
 class OneLayerModel(nn.Module):
     def __init__(self, n_input, n_hidden1, n_output, bs):
@@ -180,10 +181,12 @@ class NeuralNetworkOneLayerFF:
                 best_test_rmse_score = test_rmse_score
                 best_test_r2_score = test_r2_score
                 best_score_epoch = epoch
+                best_model = copy.deepcopy(model)
             
         print(f"Neural network one hidden layer model trained in {best_score_epoch} epochs with stats RMSE = {best_test_rmse_score}, R2 = {best_test_r2_score}")
-
-        return model, best_test_r2_score
+        
+        best_model.eval()
+        return best_model, best_test_r2_score
     
     def __select_device(self):
         if torch.cuda.is_available():
