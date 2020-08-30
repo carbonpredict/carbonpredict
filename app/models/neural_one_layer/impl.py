@@ -185,7 +185,7 @@ class NeuralNetworkOneLayerFF:
             
         print(f"Neural network one hidden layer model trained in {best_score_epoch} epochs with stats RMSE = {best_test_rmse_score}, R2 = {best_test_r2_score}")
         
-        best_model.eval()
+        best_model.eval().to('cpu')
         return best_model, best_test_r2_score
     
     def __select_device(self):
