@@ -54,6 +54,8 @@ After the server is started, you can test the API using the **OpenAPI UI** (a.k.
 
 **Linear Regression** (*linear_reg*): RMSE = 15.45228099822998, R2 = 0.687436167942354. Uses all features except the empy features from the training data (*label* and *unspsc_code*). Makes an avarage 15,5 gram error on a single CO2e prediction.
 
+**Linear Regression 5 features** (*linear_reg_5*): RMSE = 18.297489166259766, R2 = 0.5617352781670235. Uses only 5 features, category-1, -2, -3, fabric_type and size. Makes an avarage 18,3 gram error on a single CO2e prediction.
+
 ### Pretrained models
 There are pretrained models available in the subfolder *[/pretrained_models_textile-v1.0.0](/pretrained_models_textile-v1.0.0)*. There models have been trained using the dataset *textile-v.1.0.0*. If you want to use these models, you can copy the model files to the directory */mnt_models*. You can then use the models for predictions (without training new ones). Note: if you have copied a model file into the folder */mnt_models* and run the training of a model again, the model file in */mnt_models* will be overwritten.
 
