@@ -26,7 +26,7 @@ class LinearRegression(CarbonModelBase):
         # Drop empty features (dataset v. 1.0.0): unspsc_code, label 
         X = X.drop(["label", "unspsc_code"], axis=1)
 
-        X = X.drop('weight', axis=1)
+        #X = X.drop('weight', axis=1)
 
         # Use unordered caterogies for several columns. List category values to support use cases when some
         # values are absent from a batch of source data.
@@ -68,7 +68,7 @@ class LinearRegression(CarbonModelBase):
         joblib.dump(self.model, f"{base_dir}/{self.filename}")
 
     def __train(self, X, y):
-        print(f"Training linear regression model")
+        #print(f"Training linear regression model")
 
 
         #print('Preprocess data')
@@ -84,9 +84,9 @@ class LinearRegression(CarbonModelBase):
 
         # Initialize and train linear model
         model = linear_model.LinearRegression()
-        #print('Model initialized')
+        print('Model initialized. Starting to train model')
         model.fit(X_train, y_train)
-        print('Model trained')
+        #print('Model trained')
     
         # Make predictions based on the model
         y_fit = model.predict(X_test)
@@ -116,5 +116,8 @@ class LinearRegression(CarbonModelBase):
 
     def predict(self, X):
         X = self.__preprocess(X)
-        X = X.drop('co2_total', axis=1)
+        if 'co2_total' in X:
+            X = X.drop('co2_total', axis=1)
+        #if 'weight' in X:
+        #    X = X.drop('weight', axis=1)
         return self.model.predict(X)
