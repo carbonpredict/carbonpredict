@@ -20,7 +20,7 @@ class LinearRegression(CarbonModelBase):
         self.model = None
 
     def __set_filename(self):
-        self.filename = f"linear_reg.model"
+        self.filename = f"linear_reg-all_features.model"
 
     def __preprocess(self, X):
         # Drop empty features (dataset v. 1.0.0): unspsc_code, label 
@@ -69,7 +69,6 @@ class LinearRegression(CarbonModelBase):
 
     def __train(self, X, y):
         #print(f"Training linear regression model")
-
 
         #print('Preprocess data')
         X = self.__preprocess(X)
