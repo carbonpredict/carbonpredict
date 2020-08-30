@@ -88,30 +88,30 @@ parameters:
           description: Product weight in kilograms
       example:
         ML-model: lgbm_default
-        brand: b119
-        category-1: kidswear
-        category-2: suit
-        category-3: tie
-        colour: blue gray
+        brand: b143
+        category-1: menswear
+        category-2: clothing
+        category-3: pants
+        colour: dark grey
         fabric_type: K
-        ftp_acrylic: 15.0
-        ftp_cotton: 0
+        ftp_acrylic": 0
+        ftp_cotton: 80.0
         ftp_elastane: 0
-        ftp_linen: 33.0
-        ftp_other: 7.0
+        ftp_linen: 0
+        ftp_other: 0
         ftp_polyamide: 0
-        ftp_polyester: 14.0
-        ftp_polypropylene: 11.0
-        ftp_silk: 15.0
+        ftp_polyester: 20.0
+        ftp_polypropylene: 0
+        ftp_silk: 0
         ftp_viscose: 0
-        ftp_wool: 10.0
-        gender: Y
+        ftp_wool: 0
+        gender: M
         label:
         made_in: CN
         season: AYR
-        size: XS
+        size: M
         unspsc_code:
-        weight: 0.1
+        weight:
 responses:
   '201':
     description: Created
