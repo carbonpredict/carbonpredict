@@ -64,7 +64,7 @@ AVAILABLE_MODELS = {
     'k_nearest_neighbors': KNearestNeighbors,
     'lgbm_default': LGBMDefault,
     'lgbm_qreg': LGBMQuantileRegression,
-    'linear_reg': LinearRegression}
+    'linear_reg': LinearRegression,
     'neural_onelayer': NeuralNetworkOneLayerFF,
-    'neural_one_layer_robust': NeuralNetworkOneLayerFFRobust
+    'neural_onelayer_robust': NeuralNetworkOneLayerFFRobust
 }
