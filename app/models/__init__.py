@@ -55,6 +55,7 @@ class CarbonModelBase(ABC):
 from .k_nearest_neighbors import KNearestNeighbors
 from .lgbm_default import LGBMDefault, LGBMQuantileRegression
 from .linear_reg import LinearRegression
+from .linear_reg_5 import LinearRegression5
 from .neural_one_layer import NeuralNetworkOneLayerFF
 from .neural_one_layer_robust import NeuralNetworkOneLayerFFRobust
 
@@ -64,7 +65,8 @@ AVAILABLE_MODELS = {
     'k_nearest_neighbors': KNearestNeighbors,
     'lgbm_default': LGBMDefault,
     'lgbm_qreg': LGBMQuantileRegression,
-    'linear_reg': LinearRegression}
+    'linear_reg': LinearRegression,
+    'linear_reg_5': LinearRegression5,
     'neural_onelayer': NeuralNetworkOneLayerFF,
     'neural_one_layer_robust': NeuralNetworkOneLayerFFRobust
 }
