@@ -94,6 +94,7 @@ Endpoint: */ccaas/api/v0.1/train* (POST). HTTP body is type application/json and
 ```
 
 ## Possible future features
+- Use a more varied and more realistic dataset
 - Add prediction intervals (5-percentile and 95-percentile) to more models
 - Extend software to support other product categories
 
