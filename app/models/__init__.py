@@ -68,5 +68,5 @@ AVAILABLE_MODELS = {
     'linear_reg': LinearRegression,
     'linear_reg_5': LinearRegression5,
     'neural_onelayer': NeuralNetworkOneLayerFF,
-    'neural_one_layer_robust': NeuralNetworkOneLayerFFRobust
+    'neural_onelayer_robust': NeuralNetworkOneLayerFFRobust
 }
