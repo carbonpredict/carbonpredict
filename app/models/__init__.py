@@ -52,19 +52,21 @@ class CarbonModelBase(ABC):
         pass
 
 # Import your models here
-from .dummy import DummyModel
-from .lgbm_default import LGBMDefault, LGBMQuantileRegression
 from .k_nearest_neighbors import KNearestNeighbors
-from .neural_one_layer import NeuralNetworkOneLayerFF
+from .lgbm_default import LGBMDefault, LGBMQuantileRegression
 from .linear_reg import LinearRegression
 from .linear_reg_5 import LinearRegression5
+from .neural_one_layer import NeuralNetworkOneLayerFF
+from .neural_one_layer_robust import NeuralNetworkOneLayerFFRobust
 
 # Add your model to AVAILABLE_MODELS as name: Model entry. 
 # Name is used in the command line to select the model.
-AVAILABLE_MODELS = {'dummy': DummyModel, 
-                    'k_nearest_neighbors': KNearestNeighbors,
-                    'lgbm_default': LGBMDefault,
-                    'lgbm_qreg': LGBMQuantileRegression,
-                    'neural_onelayer': NeuralNetworkOneLayerFF,
-                    'linear_reg': LinearRegression,
-                    'linear_reg_5': LinearRegression5}
+AVAILABLE_MODELS = {
+    'k_nearest_neighbors': KNearestNeighbors,
+    'lgbm_default': LGBMDefault,
+    'lgbm_qreg': LGBMQuantileRegression,
+    'linear_reg': LinearRegression,
+    'linear_reg_5': LinearRegression5,
+    'neural_onelayer': NeuralNetworkOneLayerFF,
+    'neural_one_layer_robust': NeuralNetworkOneLayerFFRobust
+}

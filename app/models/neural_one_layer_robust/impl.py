@@ -15,32 +15,36 @@ from torch.utils.data import TensorDataset, DataLoader
 import os
 import copy
 
-class OneLayerModel(nn.Module):
-    def __init__(self, n_input, n_hidden1, n_output, bs):
+class OneLayerModelRobust(nn.Module):
+    def __init__(self, n_input, n_hidden1, n_output, bs, p):
         super().__init__()
         self.bs = bs
+        self.drop_layer = nn.Dropout(p=p)
         self.input_layer = nn.Linear(n_input, n_hidden1)
         self.hidden1 = nn.Linear(n_hidden1, n_output)
         self.relu = nn.ReLU()
         
     def forward(self, x):
+        x = self.drop_layer(x)
         x = self.input_layer(x)
         x = self.relu(x)
         x = self.hidden1(x)
         return x
 
-class NeuralNetworkOneLayerFF:
+class NeuralNetworkOneLayerFFRobust:
     """
-    A feedforward neural network model with one hidden layer. The number of neurons in the hidden layer can
-    be given as a parameter to the constructor (default 1024). The model will train until 5 epochs have passed without the test RMSE improving. 
+    A feedforward neural network model with one hidden layer that uses feature dropout during training. 
+    The number of neurons in the hidden layer can be given as a parameter to the constructor (default 1024).
+    The model will train until 5 epochs have passed without the test RMSE improving. 
     """
-    def __init__(self, hidden_neurons=1024):
+    def __init__(self, hidden_neurons=1024, droprate=0.2):
         self.hidden_neurons = hidden_neurons
+        self.droprate = droprate
         self.__set_filename()
         self.model = None
     
     def __set_filename(self):
-        self.filename = f"neural_onelayer-hidden_{self.hidden_neurons}.model"
+        self.filename = f"neural_onelayer_robust-hidden_{self.hidden_neurons}.model"
 
     #def preprocess(self, X):
     def __preprocess(self, X):
@@ -149,7 +153,7 @@ class NeuralNetworkOneLayerFF:
         best_model = None
         best_test_rmse_score = None
         best_test_r2_score = None
-        
+                
         fmt = '{:<5} {:12} {:12} {:<9} {:<9} {:<9} {:<9}'
         print(fmt.format('Epoch', 'Train loss', 'Valid loss', 'Train RMSE', 'Train R2', 'Test RMSE', 'Test R2'))
 
@@ -183,8 +187,8 @@ class NeuralNetworkOneLayerFF:
                 best_score_epoch = epoch
                 best_model = copy.deepcopy(model)
             
-        print(f"Neural network one hidden layer model trained in {best_score_epoch} epochs with stats RMSE = {best_test_rmse_score}, R2 = {best_test_r2_score}")
-        
+        print(f"Neural network one hidden layer robust model trained in {best_score_epoch} epochs with stats RMSE = {best_test_rmse_score}, R2 = {best_test_r2_score}")
+
         best_model.eval()
         return best_model, best_test_r2_score
     
@@ -205,27 +209,28 @@ class NeuralNetworkOneLayerFF:
         device = self.__select_device()
         lr = 0.01 # Learning rate
         bs = 1000 # Batch size
+        droprate = self.droprate
         hidden_neurons = self.hidden_neurons # Number of hidden layer neurons to use
 
         print(f"Preparing batches of training data")
         train_dataloader, test_dataloader = self.__get_dataloader(X, y)        
         
-        model = OneLayerModel(334, hidden_neurons, 1, bs).to(device)
+        model = OneLayerModelRobust(334, hidden_neurons, 1, bs, p=droprate).to(device)
         
         #optimizer = torch.optim.SGD(model.parameters(), lr=lr, momentum=0.9) # Stochastic gradient descent
         #optimizer = torch.optim.Adagrad(model.parameters(), lr=lr)
         optimizer = torch.optim.Adam(model.parameters(), lr=lr)
-
-        criterion = nn.MSELoss(reduction='mean')
         
-        print(f"Starting training of neural network one hidden layer model with {hidden_neurons} hidden layer neurons and batch size {bs}")
+        criterion = nn.MSELoss(reduction='mean')
+                
+        print(f"Starting training of neural network one hidden layer robust model with {hidden_neurons} hidden layer neurons and batch size {bs}")
         model, _ = self.__train(train_dataloader, test_dataloader, model, optimizer, criterion, device)
         self.model = model
         print(f"Training complete")
         self.__save_model(base_dir)
 
     def eval(self, X, y):
-        print(f"Evaluating neural network one hidden layer model with {hidden_neurons} hidden layer neurons and batch size {bs}")
+        print(f"Evaluating neural network one hidden layer robust model with {hidden_neurons} hidden layer neurons and batch size {bs}")
         _, s_r2 = self.__train(X, y)
         return s_r2
 
@@ -235,7 +240,7 @@ class NeuralNetworkOneLayerFF:
         X = self.__preprocess(X)
         X = X.to_numpy(dtype='float32')
         X = torch.tensor(X, dtype=torch.float)
-        X = X.to(device)
+        X = X.to(device)        
         y_pred = self.model(X)
         y_pred = y_pred.detach().cpu().numpy().flatten().tolist()
         
