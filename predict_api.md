@@ -11,11 +11,13 @@ HTTP body is type application/json and contains the input features in JSON forma
 HTTP 201 with message body of type application/json containing prediction (estimated kilograms of CO2e for product) and intervals. The intervals are null if they are not available for the requested model
 
 Example response body:
+```
 {
   "prediction": 2.8923212,
   "5-percentile": 1.2988872,
   "95-percentile": 6.610098 
 }
+```
 
 ## Example message body
 ```
