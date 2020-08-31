@@ -36,12 +36,17 @@ To train a model (here *lgbm_default*, a gradient boosting model) with the sourc
 
 As default, the train command clones the source data files (about 1 GB) into the container from a remote git repository. If you have the CSV-format source data files on your local computer, you can copy them into the subfolder */mnt_emission_data* and use the switch *--local_data* to use local data (from a docker-mounted directory) instead of cloning the data into the container. Example using the switch: `docker-compose run carbon train lgbm_default --local_data`
 
+If you want to train and evaluate a new model (but not save the model to disk), you can use the swith `--eval` like `docker-compose run carbon train k_nearest_neighbors --eval`. This will print the R2 value of the model. Some models print these values also when trained normally without the eval switch.
+
 ### Predict
 To predict a CO2e value using a trained model, run a command like `docker-compose run carbon predict lgbm_default ./testdata/test.csv`, where the last two parameters are a trained model to use and the location of the csv file to do the predictions for. 
 
 If you want the 5- and 95-percentiles, you can use the switch *--intervals* and run a command like `docker-compose run carbon predict lgbm_qreg ./testdata/test.csv --intervals`. This will return a list of 3-tuples (prediction, 5-percentile, 95-percentile). If the model does not support intervals, the command will return a list on length 1 lists with just the predictions.
 
 The columns of the CSV file must currently be in the exact order (and including the empty target column *co2_total*): brand,category-1,category-2,category-3,co2_total,colour,fabric_type,ftp_acrylic,ftp_cotton,ftp_elastane,ftp_linen,ftp_other,ftp_polyamide,ftp_polyester,ftp_polypropylene,ftp_silk,ftp_viscose,ftp_wool,gender,label,made_in,season,size,unspsc_code,weight
+
+### Evaluate trained models
+To evaluate trained models, use a command like `docker-compose run carbon evaluate_trained_models ./testdata/co2_10000.csv`, where the last parameter is the file to use for evaluation. This will get predictions on the evaluation file from all trained models and list the RMSE and R2 values for each model.
 
 ### Run server
 To run the Flask server, which offers HTTP API endpoints (see list below), run `docker-compose run --service-ports carbon run-server`. 
