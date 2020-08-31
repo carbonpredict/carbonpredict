@@ -28,7 +28,7 @@ class LinearRegression5(CarbonModelBase):
 
         keep = ['category-1', 'category-2', 'category-3', 'fabric_type', 'size']
 
-        X = X[keep]
+        X = X[keep].copy()
         #print(X.sample(5))
 
         #X = X.drop('weight', axis=1)
