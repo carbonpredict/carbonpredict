@@ -105,7 +105,6 @@ def evaluate_available_models(local_data=False, local_data_dir=None,
     preds = {}
     print('Data preparation complete. Starting training and evaluation of model.')
     for model_name in AVAILABLE_MODELS:
-        if model_name == 'k_nearest_neighbors': continue
         print(f'****{model_name}****')
         model = AVAILABLE_MODELS[model_name]()
         model.train(X_train.copy(), X_test.copy(), y_train.copy(), y_test.copy(), base_dir)
