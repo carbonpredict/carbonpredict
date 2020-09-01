@@ -5,6 +5,7 @@ import numpy as np
 from models import AVAILABLE_MODELS
 from server import cpapi
 from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.model_selection import train_test_split
 from tqdm import tqdm
 
 
@@ -35,7 +36,7 @@ def get_data_from_dir(local_data_dir=None, dataset_id=None):
     content = sorted(filter(lambda x: x.endswith('.csv'), os.listdir(local_data_dir)))
     return pd.concat((pd.read_csv(f'{local_data_dir}/{f}') for f in tqdm(content, desc="Reading csv")))
 
-def prepare_data(model_name, local_data=False, local_data_dir=None, repo_url=None, repo_data_directory=None, data_format='tgz', dataset_id=None):
+def prepare_data(local_data=False, local_data_dir=None, repo_url=None, repo_data_directory=None, data_format='tgz', dataset_id=None, random_state=42):
     X = None
 
     print("Loading csv files, this may take a while...")
@@ -50,33 +51,70 @@ def prepare_data(model_name, local_data=False, local_data_dir=None, repo_url=Non
     y = X['co2_total'].copy()
     X = X.drop('co2_total', axis=1)
 
-    return X, y
+    print('Split to training and testing data')
+    return train_test_split(X, y, test_size=0.2, random_state=random_state)
 
 def do_train(model_name, base_dir=None, local_data=False, local_data_dir=None,
     repo_url='https://github.com/Compensate-Operations/emission-sample-data.git', 
     repo_data_directory='datasets/textile-v1.0.0', 
     data_format='tgz',
-    dataset_id=None):
+    dataset_id=None,
+    random_state=42,
+    save_test=False):
 
     if (base_dir == None):
         base_dir = os.environ.get('MODEL_DIR', './')
 
-    X, y = prepare_data(model_name, local_data, local_data_dir, repo_url, repo_data_directory, data_format, dataset_id)
+    X_train, X_test, y_train, y_test = prepare_data(local_data, local_data_dir, repo_url, repo_data_directory, data_format, dataset_id, random_state)
     print('Data preparation complete. Starting training of model.')
-    AVAILABLE_MODELS[model_name]().train(X, y, base_dir)
+    model = AVAILABLE_MODELS[model_name]()
+    model.train(X_train, X_test, y_train, y_test, base_dir)
+    
 
 def do_eval(model_name, local_data=False, local_data_dir=None,
     repo_url='https://github.com/Compensate-Operations/emission-sample-data.git', 
     repo_data_directory='datasets/textile-v1.0.0', 
     data_format='tgz', 
-    dataset_id=None):
+    dataset_id=None,
+    random_state=42,
+    save_test=False):
 
-    X, y = prepare_data(model_name, local_data, local_data_dir, repo_url, repo_data_directory, data_format, dataset_id)
+    X_train, X_test, y_train, y_test = prepare_data(local_data, local_data_dir, repo_url, repo_data_directory, data_format, dataset_id, random_state)
+    preds = {}
     print('Data preparation complete. Starting training and evaluation of model.')
-    r2_score = AVAILABLE_MODELS[model_name]().eval(X, y)
+    model = AVAILABLE_MODELS[model_name]()
+    model.train(X_train, X_test, y_train, y_test, base_dir)
+    r2_score, rmse_score, y_pred = model.eval(X_test, y_test)
+    preds[model_name]=y_pred
+    if save_test:
+        pd.concat([X_test.reset_index(drop=True), y_test.reset_index(drop=True), pd.DataFrame(preds).reset_index(drop=True)], axis=1, ignore_index=True).to_csv(f'/results/test_pred_{model_name}.csv')
     print(f'Model {model_name} evaluated, r2-score {r2_score}')
 
     return r2_score
+
+def evaluate_available_models(local_data=False, local_data_dir=None,
+    repo_url='https://github.com/Compensate-Operations/emission-sample-data.git', 
+    repo_data_directory='datasets/textile-v1.0.0', 
+    data_format='tgz', 
+    dataset_id=None,
+    random_state=42,
+    save_test=False):
+    
+    X_train, X_test, y_train, y_test = prepare_data(local_data, local_data_dir, repo_url, repo_data_directory, data_format, dataset_id, random_state)
+    pd.concat([X_test.reset_index(drop=True), y_test.reset_index(drop=True)], axis=1, ignore_index=True).to_csv(f'/results/testset.csv')
+    preds = {}
+    print('Data preparation complete. Starting training and evaluation of model.')
+    for model_name in AVAILABLE_MODELS:
+        if model_name == 'k_nearest_neighbors': continue
+        print(f'****{model_name}****')
+        model = AVAILABLE_MODELS[model_name]()
+        model.train(X_train.copy(), X_test.copy(), y_train.copy(), y_test.copy(), base_dir)
+        r2_score, rmse_score, y_pred = model.eval(X_test.copy(), y_test.copy())
+        preds[model_name] = y_pred
+        print(f'Model {model_name} evaluated, r2-score {r2_score}')
+        pd.DataFrame(preds).to_csv(f'/results/test_pred_{model_name}.csv')
+    if save_test:
+            pd.concat([X_test.reset_index(drop=True), y_test.reset_index(drop=True), pd.DataFrame(preds).reset_index(drop=True)], axis=1, ignore_index=True).to_csv(f'/results/test_pred_all.csv')
 
 def format_predictions(predictions, intervals=False):
     """Ensure that predictions are non-negative and format them to a python list (or list of lists for the intervals option)"""
@@ -181,6 +219,8 @@ if __name__ == '__main__':
     train_parser.add_argument('model', type=str, help='Select model')
     train_parser.add_argument('--eval', action='store_true', help='Evaluate model')
     train_parser.add_argument('--local_data', action='store_true', help='Use csv source data in directory /tmp/emission_data')
+    train_parser.add_argument('--random_state', type=str, help='Random state for train-test split')
+    train_parser.add_argument('--save_test', action='store_true', help='Store test set')
     
     predict_parser = subparsers.add_parser('predict')
     predict_parser.add_argument('model', type=str, help='Select model')
@@ -189,6 +229,10 @@ if __name__ == '__main__':
     
     evalmodels_parser = subparsers.add_parser('evaluate_trained_models')
     evalmodels_parser.add_argument('csv_file', type=str, help='CSV file with test data')
+
+    evaltrainmodels_parser = subparsers.add_parser('retrain_evaluate_models')
+    evaltrainmodels_parser.add_argument('--save_test', action='store_true', help='Store test sets')
+    evaltrainmodels_parser.add_argument('--random_state', type=str, help='Random state for train-test split')
 
     server_parser = subparsers.add_parser('run-server')
     
@@ -205,14 +249,14 @@ if __name__ == '__main__':
         if args.model in AVAILABLE_MODELS:
             if args.eval:
                 if (args.local_data):
-                    _ = do_eval(args.model, local_data=True, local_data_dir=local_data_dir)
+                    _ = do_eval(args.model, local_data=True, local_data_dir=local_data_dir, random_state=args.random_state, save_test=args.save_test)
                 else:
-                    _ = do_eval(args.model)
+                    _ = do_eval(args.model, random_state=args.random_state, save_test=args.save_test)
             else:
                 if (args.local_data):
-                    do_train(args.model, base_dir=base_dir, local_data=True, local_data_dir=local_data_dir)
+                    do_train(args.model, base_dir=base_dir, local_data=True, local_data_dir=local_data_dir, random_state=args.random_state, save_test=args.save_test)
                 else:
-                    do_train(args.model, base_dir=base_dir)
+                    do_train(args.model, base_dir=base_dir, random_state=args.random_state, save_test=args.save_test)
         else:
             print(f'Error: model {args.model} is not available')
     elif args.subcommand == 'predict':
@@ -234,6 +278,8 @@ if __name__ == '__main__':
     elif args.subcommand == 'evaluate_trained_models':
         evaluate_trained_models(args.csv_file, base_dir)
         sys.exit(0)
+    elif args.subcommand == 'retrain_evaluate_models':
+        evaluate_available_models(local_data=True, local_data_dir=local_data_dir, random_state=args.random_state, save_test=args.save_test)
     elif args.subcommand == 'run-server':
         print('Starting web server...')
         cpapi.run()

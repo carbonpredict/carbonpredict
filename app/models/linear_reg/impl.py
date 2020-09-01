@@ -67,51 +67,51 @@ class LinearRegression(CarbonModelBase):
         print(f"Saving Linear Regression model to disk at {base_dir}/{self.filename}")
         joblib.dump(self.model, f"{base_dir}/{self.filename}")
 
-    def __train(self, X, y):
+    def __train(self, X_train, y_train):
         #print(f"Training linear regression model")
 
         #print('Preprocess data')
-        X = self.__preprocess(X)
+        X_train = self.__preprocess(X_train)
         print('Data preprocessed')
-        X = X.to_numpy(dtype='float32')
-        y = y.to_numpy(dtype='float32')
+        X_train = X_train.to_numpy(dtype='float32')
+        y_train = y_train.to_numpy(dtype='float32')
         #print('Formatted to numpy')
     
         # Split training data
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-        print('Split to training and testing data')
+        #X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+        #print('Split to training and testing data')
 
         # Initialize and train linear model
         model = linear_model.LinearRegression()
         print('Model initialized. Starting to train model')
         model.fit(X_train, y_train)
-        #print('Model trained')
-    
+        #print('Model trained')        
+
+        return model
+
+
+    def load(self, base_dir):
+        self.model = joblib.load(f"{base_dir}/{self.filename}")
+
+    def train(self, X_train, X_test, y_train, y_test, base_dir=None):
+        print(f"Training Linear Regression model")
+        model = self.__train(X_train, y_train)
+        self.model = model
+        self.__save_model(base_dir)
+
+    def eval(self, X_test, y_test):
+        print(f"Evaluating Linear Regression model")
+        X_test = self.__preprocess(X_test)
+        print('Data preprocessed')
         # Make predictions based on the model
-        y_fit = model.predict(X_test)
+        y_fit = self.model.predict(X_test)
         #print('Predictions stored')
     
         # Evaluate model
         s_rmse = mean_squared_error(y_test, y_fit, squared=False)
         s_r2 = r2_score(y_test, y_fit)
         print(f"Linear model trained with stats RMSE = {s_rmse}, R2 = {s_r2}")
-
-        return model, s_r2
-
-
-    def load(self, base_dir):
-        self.model = joblib.load(f"{base_dir}/{self.filename}")
-
-    def train(self, X, y, base_dir=None):
-        print(f"Training Linear Regression model")
-        model, _ = self.__train(X, y)
-        self.model = model
-        self.__save_model(base_dir)
-
-    def eval(self, X, y):
-        print(f"Evaluating Linear Regression model")
-        _, s_r2 = self.__train(X, y)
-        return s_r2
+        return s_r2, s_rmse, y_fit
 
     def predict(self, X):
         X = self.__preprocess(X)

@@ -9,7 +9,7 @@ class CarbonModelBase(ABC):
         pass
 
     @abstractmethod
-    def load(base_dir):
+    def load(self, base_dir):
         """
         Load existing model
         @param filename name of the existing model
@@ -17,7 +17,7 @@ class CarbonModelBase(ABC):
         pass
 
     @abstractmethod
-    def train(X, y, base_dir=None):
+    def train(self, X, y, base_dir=None):
         """
         Train and save the model to
         a given location. 
@@ -29,7 +29,7 @@ class CarbonModelBase(ABC):
         pass
 
     @abstractmethod
-    def eval(X, y):
+    def eval(self, X, y):
         """
         Evaluate the model and return S^2 score. 
 
@@ -41,7 +41,7 @@ class CarbonModelBase(ABC):
 
      
     @abstractmethod
-    def predict(X):
+    def predict(self, X):
         """
         Predict from loaded model. Make sure
         to load() or train() the model first.

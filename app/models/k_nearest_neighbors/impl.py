@@ -63,33 +63,39 @@ class KNearestNeighbors(CarbonModelBase):
 
         # Convert the categoricals into a one-hot vector of binary variables
         X = pd.get_dummies(X)
-
+        print('Data preprocessed')
         return X
 
     def __save_model(self, base_dir):
         print(f"Saving K-nearest neighbors model to disk at {base_dir}/{self.filename}")
         joblib.dump(self.model, f"{base_dir}/{self.filename}")
 
-    def __train(self, X, y):
+    def __train(self, X_train, y_train):
         # Only use the set number of samples for training
-        if (len(X.index) > self.training_samples):
-            X = X[:self.training_samples]
-            y = y[:self.training_samples]
-        
-        X = self.__preprocess(X)
+        if (len(X_train.index) > self.training_samples):
+            X_train = X_train[:self.training_samples]
+            y_train = y_train[:self.training_samples]
 
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+        #X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+        X_train = self.__preprocess(X_train)
 
         model = neighbors.KNeighborsRegressor(self.n_neighbors, weights='uniform')
+        print('Model initialized. Starting to train model')
         model.fit(X_train, y_train)
 
+        return model
+
+    def __evaluate(self, X_test, y_test, model=None):
+        if not model:
+            model = self.model
+
+        X_test = self.__preprocess(X_test)
         preds = model.predict(X_test)
 
         s_rmse = np.sqrt(mean_squared_error(y_test, preds))
         s_r2 = r2_score(y_test, preds)
-        print(f"K-nearest neighbors trained with stats RMSE = {s_rmse}, R2 = {s_r2}")
 
-        return model, s_r2
+        return s_rmse, s_r2, preds
 
     def set_n_neighbors(self, k):
         """
@@ -97,7 +103,7 @@ class KNearestNeighbors(CarbonModelBase):
 
         @param k (int): Number of neighbors to use in the k-nearest neigbors algorithm
         """
-        self.n_neighbors = n
+        self.n_neighbors = k
         self.__set_filename()
     
     def set_training_samples(self, samples):
@@ -113,16 +119,20 @@ class KNearestNeighbors(CarbonModelBase):
     def load(self, base_dir):
         self.model = joblib.load(f"{base_dir}/{self.filename}")
 
-    def train(self, X, y, base_dir=None):
+    def train(self, X_train, X_test, y_train, y_test, base_dir=None):
         print(f"Training K-nearest neighbors model with k = {self.n_neighbors} using {self.training_samples} samples")
-        model, _ = self.__train(X, y)
+        model = self.__train(X_train, y_train)
         self.model = model
+
         self.__save_model(base_dir)
 
-    def eval(self, X, y):
+    def eval(self, X_test, y_test):
         print(f"Evaluating K-nearest neighbors model with k = {self.n_neighbors} using training with {self.training_samples} samples")
-        _, s_r2 = self.__train(X, y)
-        return s_r2
+        
+        s_rmse, s_r2, y_pred = self.__evaluate(X_test, y_test)
+        print(f"K-nearest neighbors trained with stats RMSE = {s_rmse}, R2 = {s_r2}")
+
+        return s_r2, s_rmse, y_pred
 
     def predict(self, X):
         X = self.__preprocess(X)
