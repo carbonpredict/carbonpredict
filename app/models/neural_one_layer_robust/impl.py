@@ -230,6 +230,7 @@ class NeuralNetworkOneLayerFFRobust:
     def eval(self, X_test, y_test):
         # Make predictions based on the model
         print(f"Evaluating neural network one hidden layer model with {self.hidden_neurons} hidden layer neurons and batch size {self.bs}")
+        model.eval()
         y_fit = self.predict(X_test)
         #print('Predictions stored')
     
