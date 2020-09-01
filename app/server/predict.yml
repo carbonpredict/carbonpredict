@@ -106,12 +106,12 @@ parameters:
         ftp_viscose: 0
         ftp_wool: 0
         gender: M
-        label:
+        label: ""
         made_in: CN
         season: AYR
         size: M
-        unspsc_code:
-        weight:
+        unspsc_code: ""
+        weight: ""
 responses:
   '201':
     description: Created

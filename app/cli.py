@@ -194,7 +194,7 @@ def convert_params_to_df(params):
     # Some initial data type conversions: ideally the models should be robust enough to take care of this, but trying it here for now
     # Note: in the first dataset completely empty columns label and unspc_code are defined as bools here (lgbm is apparently using them and breaks if they are not int, float or bool). 
     # They should be treated some other way. The K-NN model drops them before further processing, so data type does not matter for it.
-    X = X.astype({'ftp_acrylic': 'float64', 'ftp_cotton': 'float64', 'ftp_elastane': 'float64', 'ftp_linen': 'float64', 'ftp_other': 'float64', 'ftp_polyamide': 'float64', 'ftp_polyester': 'float64', 'ftp_polypropylene': 'float64', 'ftp_silk': 'float64', 'ftp_viscose': 'float64', 'ftp_wool': 'float64', 'label': 'bool', 'unspsc_code': 'bool'})
+    X = X.astype({'ftp_acrylic': 'float64', 'ftp_cotton': 'float64', 'ftp_elastane': 'float64', 'ftp_linen': 'float64', 'ftp_other': 'float64', 'ftp_polyamide': 'float64', 'ftp_polyester': 'float64', 'ftp_polypropylene': 'float64', 'ftp_silk': 'float64', 'ftp_viscose': 'float64', 'ftp_wool': 'float64', 'label': 'bool', 'unspsc_code': 'bool', 'weight': 'float64'})
     return X
 
 def do_prediction_with_params(model, params, intervals=False):
