@@ -11,7 +11,7 @@ The application is a dockerized machine learning pipeline that can ingest a sour
 
 *[/pretrained_models_textile-v1.0.0](/pretrained_models_textile-v1.0.0)*. There models have been trained using the dataset *textile-v.1.0.0*.
 
-*[/testdata](/testdata)* contains json test data to test the predict API with and csv test data to test the predict (from CLI with).
+*[/testdata](/testdata)* contains JSON test data to test the predict API with and csv test data to test the predict command using the CLI.
 
 *[/visualizations](/visualizations)* contains some visualizations (png images) of the source data. These have been output from the notebook Visualizations.ipynb.
 
@@ -36,7 +36,9 @@ To train a model (here *lgbm_default*, a gradient boosting model) with the sourc
 
 As default, the train command clones the source data files (about 1 GB) into the container from a remote git repository. If you have the CSV-format source data files on your local computer, you can copy them into the subfolder */mnt_emission_data* and use the switch *--local_data* to use local data (from a docker-mounted directory) instead of cloning the data into the container. Example using the switch: `docker-compose run carbon train lgbm_default --local_data`
 
-If you want to train and evaluate a new model (but not save the model to disk), you can use the swith `--eval` like `docker-compose run carbon train k_nearest_neighbors --eval`. This will print the R2 value of the model. Some models print these values also when trained normally without the eval switch.
+If you want to train and evaluate a model, you can use the swith `--eval` like `docker-compose run carbon train k_nearest_neighbors --eval`. This will train the model, save it to disk and evaluate the model, printing out the RMSE and R2 scores (evaluated using a 20 % test set withheld from training).
+
+Adding the switch `--save_test` to the switch `--eval` and thus running a command like `docker-compose run carbon train k_nearest_neighbors --eval --save_test`, you can save the evaluation results of the model in path like `/results/test_pred_k_nearest_neighbors.csv`, where the model name is included in the file name.
 
 ### Predict
 To predict a CO2e value using a trained model, run a command like `docker-compose run carbon predict lgbm_default ./testdata/test.csv`, where the last two parameters are a trained model to use and the location of the csv file to do the predictions for. 
@@ -47,6 +49,9 @@ The columns of the CSV file must currently be in the exact order (and including 
 
 ### Evaluate trained models
 To evaluate trained models, use a command like `docker-compose run carbon evaluate_trained_models ./testdata/co2_10000.csv`, where the last parameter is the file to use for evaluation. This will get predictions on the evaluation file from all trained models and list the RMSE and R2 values for each model.
+
+### Retrain and evaluate models
+The command `docker-compose run carbon retrain_evaluate_models` will retrain and evaluate all models using local data. The command will save the test data to the file `/results/testset.csv` and the prediction of each model in the file `/results/test_pred_{model_name}.csv`. If you add the switch `--save_test`, it will also save a sum-up file with all predictions from all models. Understandably this command may be quite long-running with a big source dataset.
 
 ### Run server
 To run the Flask server, which offers HTTP API endpoints (see list below), run `docker-compose run --service-ports carbon run-server`. 
