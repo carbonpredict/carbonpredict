@@ -85,9 +85,10 @@ class LGBMDefault(CarbonModelBase):
             self.models.append(lgb.Booster(model_file=f"{base_dir}/{self.__get_filename(idx)}"))
 
 
-    def train(self, X, y, base_dir=None):
-        models, _ = self.__train(X, y)
+    def train(self, X_train, X_test, y_train, y_test, base_dir=None):
+        models, _ = self.__train(X_train, y_train)
 
+        self.models = models
         print(f"Saving model to {base_dir}/")
 
         for idx, model in enumerate(tqdm(models, total = self.n_splits, desc="Save")):
@@ -95,15 +96,18 @@ class LGBMDefault(CarbonModelBase):
                             num_iteration=model.best_iteration)
 
 
-    def eval(self, X, y):
-        _, s_r2 = self.__train(X, y)
+    def eval(self, X_test, y_test):
+        pred = self.predict(X_test)
+        s_rmse = mean_squared_error(y_test, pred, squared=False)
+        s_r2 = r2_score(y_test, pred)
+        print(f"Linear model trained with stats RMSE = {s_rmse}, R2 = {s_r2}")
 
-        return s_r2
+        return s_r2, s_rmse, pred
 
 
     def predict(self, X):
         X = self.__preprocess(X)
-        X = X.drop("co2_total", axis=1)
+        X = X.drop("co2_total", axis=1, errors='ignore')
         return list(np.mean([model.predict(X) for model in self.models], axis=0))
 
 
@@ -136,11 +140,12 @@ class LGBMQuantileRegression(LGBMDefault):
         return f"lgbm_qreg-{c}.model"
 
 
-    def train(self, X, y, base_dir=None):
-        X = self._LGBMDefault__preprocess(X)
+    def train(self, X_train, X_test, y_train, y_test, base_dir=None):
+        X_train = self._LGBMDefault__preprocess(X_train)
         
-        qreg_low, qreg_mid, qreg_high = self.__train_qreg(X, y)
+        qreg_low, qreg_mid, qreg_high = self.__train_qreg(X_train, y_train)
 
+        self.qreg_mid = qreg_mid
         qreg_low.booster_.save_model(f"{base_dir}/{self.__get_qreg_filename('low')}")
         qreg_mid.booster_.save_model(f"{base_dir}/{self.__get_qreg_filename('mid')}")
         qreg_high.booster_.save_model(f"{base_dir}/{self.__get_qreg_filename('high')}")
@@ -151,10 +156,24 @@ class LGBMQuantileRegression(LGBMDefault):
         self.qreg_mid = lgb.Booster(model_file=f"{base_dir}/{self.__get_qreg_filename('mid')}")
         self.qreg_high = lgb.Booster(model_file=f"{base_dir}/{self.__get_qreg_filename('high')}")
 
+    def eval(self, X_test, y_test):
+        pred = self.predict_exact(X_test)
+        s_rmse = mean_squared_error(y_test, pred, squared=False)
+        s_r2 = r2_score(y_test, pred)
+        print(f"Linear model trained with stats RMSE = {s_rmse}, R2 = {s_r2}")
+
+        return s_r2, s_rmse, pred
+        
+    def predict_exact(self, X):
+        X = self._LGBMDefault__preprocess(X)
+        X = X.drop("co2_total", axis=1, errors='ignore')
+
+        mid_pred = self.qreg_mid.predict(X)
+        return mid_pred
 
     def predict(self, X):
         X = self._LGBMDefault__preprocess(X)
-        X = X.drop("co2_total", axis=1)
+        X = X.drop("co2_total", axis=1, errors='ignore')
 
         low_pred = self.qreg_low.predict(X)
         mid_pred = self.qreg_mid.predict(X)

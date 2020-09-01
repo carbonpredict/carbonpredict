@@ -9,3 +9,4 @@ services:
            volumes:
              - ./mnt_models:/usr/app/mnt
              - ./mnt_emission_data:/emission_data
+             - ./mnt_results:/results

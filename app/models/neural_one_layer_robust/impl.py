@@ -94,14 +94,16 @@ class NeuralNetworkOneLayerFFRobust:
     def __save_model(self, model, base_dir):
         torch.save(model, f"{base_dir}/{self.filename}")
 
-    def __get_dataloader(self, X, y, bs=1000, test_size=0.2):
-        X = self.__preprocess(X)
-        X = X.to_numpy(dtype='float32')
-        y = y.to_numpy(dtype='float32')
+    def __get_dataloader(self, X_train, X_test, y_train, y_test, bs=1000, test_size=0.2):
+        X_train = self.__preprocess(X_train)
+        X_test = self.__preprocess(X_test)
+        X_train = X_train.to_numpy(dtype='float32')
+        X_test = X_test.to_numpy(dtype='float32')
+        y_train = y_train.to_numpy(dtype='float32')
+        y_test = y_test.to_numpy(dtype='float32')
         
-        y = y.reshape((-1,1))
-        
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=42)
+        y_train = y_train.reshape((-1,1))
+        y_test = y_test.reshape((-1,1))
 
         train_dataloader = DataLoader(TensorDataset(
             torch.tensor(X_train, dtype=torch.float),
@@ -184,6 +186,7 @@ class NeuralNetworkOneLayerFFRobust:
                 best_test_rmse_score = test_rmse_score
                 best_test_r2_score = test_r2_score
                 best_score_epoch = epoch
+                self.model = model
                 if (write_model_to_disk):
                     self.__save_model(model, base_dir)
             
@@ -207,10 +210,10 @@ class NeuralNetworkOneLayerFFRobust:
         model.eval()
         self.model = model
 
-    def train(self, X, y, base_dir=None):
+    def train(self, X_train, X_test, y_train, y_test, base_dir=None):
         device = self.__select_device()
         print(f"Preparing batches of training data")
-        train_dataloader, test_dataloader = self.__get_dataloader(X, y)
+        train_dataloader, test_dataloader = self.__get_dataloader(X_train, X_test, y_train, y_test)
         
         model = OneLayerModelRobust(334, self.hidden_neurons, 1, self.bs, p=self.droprate).to(device)
         
@@ -224,22 +227,20 @@ class NeuralNetworkOneLayerFFRobust:
         _ = self.__train(train_dataloader, test_dataloader, model, optimizer, criterion, device, base_dir, write_model_to_disk=True)
         print(f"Training complete")
 
-    def eval(self, X, y):
-        device = self.__select_device()
-        print(f"Preparing batches of training data")
-        train_dataloader, test_dataloader = self.__get_dataloader(X, y)
-        
-        model = OneLayerModelRobust(334, self.hidden_neurons, 1, self.bs, p=self.droprate).to(device)
-        optimizer = torch.optim.Adam(model.parameters(), lr=self.lr)
-        
-        criterion = nn.MSELoss(reduction='mean')
-        
-        print(f"Evaluating neural network one hidden layer robust model with {self.hidden_neurons} hidden layer neurons and batch size {self.bs}")
-        s_r2 = self.__train(train_dataloader, test_dataloader, model, optimizer, criterion, device, base_dir, write_model_to_disk=False)
-        return s_r2
+    def eval(self, X_test, y_test):
+        # Make predictions based on the model
+        print(f"Evaluating neural network one hidden layer model with {self.hidden_neurons} hidden layer neurons and batch size {self.bs}")
+        y_fit = self.predict(X_test)
+        #print('Predictions stored')
+    
+        # Evaluate model
+        s_rmse = mean_squared_error(y_test, y_fit, squared=False)
+        s_r2 = r2_score(y_test, y_fit)
+        print(f"NN trained with stats RMSE = {s_rmse}, R2 = {s_r2}")
+        return s_r2, s_rmse, y_fit
 
     def predict(self, X):
-        X = X.drop(["co2_total"], axis=1)
+        X = X.drop(["co2_total"], axis=1, errors='ignore')
         device = self.__select_device()
         X = self.__preprocess(X)
         X = X.to_numpy(dtype='float32')
