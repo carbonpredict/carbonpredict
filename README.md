@@ -60,15 +60,15 @@ After the server is started, you can test the API using the **OpenAPI UI** (a.k.
 
 ## Current machine learning models
 
-**Gradient boosting** (*lgbm_default* or *lgbm_qreg*):  Root mean squared error (RMSE) = 12.5, r2 (coefficient of determination) = 0.7935093722105526. Makes on average a 12,5 gram error on a single CO2e prediction. Quantile regression (*lgbm_qreg*) version provides additionally confidence intervals, while lgb default model (*lgbm_default*) tries to provide as accurate prediction as possible. 
+**Gradient boosting** (*lgbm_default* or *lgbm_qreg*):  Root mean squared error (RMSE) = 12.5, r2 (coefficient of determination) = 0.7935093722105526. Makes on average a 12,5 kg error on a single CO2e prediction. Quantile regression (*lgbm_qreg*) version provides additionally confidence intervals, while lgb default model (*lgbm_default*) tries to provide as accurate prediction as possible. 
 
 **Neural network one-layer model** (*neural_onelayer*): RMSE = 9.822982788085938, R2 = 0.8707626750063729. A neural network model with one hidden layer (with 1024 neurons). Implemented using Pytorch. The model uses a GPU for training, evaluation and prediction is a GPU is available in the environment (note: when running in Docker container, you must make the GPU available within the container). Makes on average a 9,8 gram error on a single CO2e prediction. There is also a variant named *neural_onelayer_robust* that uses feature dropout in training and should result in a model that can withstand missing columns (compared to the training data) better (yet to be confirmed). Its RMSE = 12.1198 and R2 = 0.8061.
 
-**Simple K-nearest neighbors** (*k_nearest_neighbors*) (using only category-1, category-2, category-3, fabric_type and size):  RMSE = 19.476921284404497, R2 = 0.5095385877102603. Makes on average a 19,5 gram error on a single CO2e prediction.
+**Simple K-nearest neighbors** (*k_nearest_neighbors*) (using only category-1, category-2, category-3, fabric_type and size):  RMSE = 19.476921284404497, R2 = 0.5095385877102603. Makes on average a 19,5 kg error on a single CO2e prediction.
 
-**Linear Regression** (*linear_reg*): RMSE = 15.45228099822998, R2 = 0.687436167942354. Uses all features except the empy features from the training data (*label* and *unspsc_code*). Makes an avarage 15,5 gram error on a single CO2e prediction.
+**Linear Regression** (*linear_reg*): RMSE = 15.45228099822998, R2 = 0.687436167942354. Uses all features except the empy features from the training data (*label* and *unspsc_code*). Makes an avarage 15,5 kg error on a single CO2e prediction.
 
-**Linear Regression 5 features** (*linear_reg_5*): RMSE = 18.297489166259766, R2 = 0.5617352781670235. Uses only 5 features, category-1, -2, -3, fabric_type and size. Makes an avarage 18,3 gram error on a single CO2e prediction.
+**Linear Regression 5 features** (*linear_reg_5*): RMSE = 18.297489166259766, R2 = 0.5617352781670235. Uses only 5 features, category-1, -2, -3, fabric_type and size. Makes an avarage 18,3 kg error on a single CO2e prediction.
 
 ### Pretrained models
 There are pretrained models available in the subfolder *[/pretrained_models_textile-v1.0.0](/pretrained_models_textile-v1.0.0)*. There models have been trained using the dataset *textile-v.1.0.0*. If you want to use these models, you can copy the model files to the directory */mnt_models*. You can then use the models for predictions (without training new ones). Note: if you have copied a model file into the folder */mnt_models* and run the training of a model again, the model file in */mnt_models* will be overwritten.
